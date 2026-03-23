@@ -614,7 +614,7 @@
                                                 fill="#2EB97E"></path>
                                             <path d="M12.5 10L8.5 12.5L8.5 7.5L12.5 10Z" fill="#2EB97E"></path>
                                         </svg>
-                                        <p><strong>Courses:</strong> <span>{{ $bundle->courses->count() }}</span></p>
+                                        <p><strong>Courses:</strong> <span>{{ $bundle->title }}</span></p>
                                     </li>
 
                                     <li style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
