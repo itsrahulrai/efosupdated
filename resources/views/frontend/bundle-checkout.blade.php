@@ -298,8 +298,13 @@
 
                                 <div class="col-md-8">
                                     <h5 class="course-title">{{ $bundle->title }}</h5>
-                                    <p class="course-description">
-                                        {{ Str::limit($bundle->short_description, 180) }}
+                                    <!--<p class="course-description">-->
+                                    <!--    {{ Str::limit($bundle->short_description, 220) }}-->
+                                        
+                                    <!--</p>-->
+                                     <p class="course-description text-justify">
+                                        {{ $bundle->short_description }}
+                                        
                                     </p>
                                     <div class="mt-3">
                                         <span class="badge bg-danger">

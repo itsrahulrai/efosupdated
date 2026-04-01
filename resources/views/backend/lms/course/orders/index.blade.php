@@ -45,13 +45,13 @@
                                     @forelse ($courseOrders as $index => $order)
                                         <tr>
                                             <td>{{ $courseOrders->firstItem() + $index }}</td>
-
                                             <td>
-                                                @if ($order->course->thumbnail)
-                                                    <img src="{{ static_asset($order->course->thumbnail) }}" width="60"
-                                                        class="rounded">
+                                                @if (optional($order->course)->thumbnail)
+                                                    <img src="{{ static_asset(optional($order->course)->thumbnail) }}" 
+                                                         width="60" 
+                                                         class="rounded">
                                                 @else
-                                                    <span class="text-muted">N/A</span>
+                                                    N/A
                                                 @endif
                                             </td>
 

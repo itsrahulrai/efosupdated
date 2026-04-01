@@ -29,6 +29,13 @@ class LoginRequest extends FormRequest
 
  public function authenticate(): void
 {
+            $this->merge([
+            'password' => trim($this->password),
+            'email' => trim($this->email),
+            'registration_number' => trim($this->registration_number),
+        ]);
+
+
     $this->ensureIsNotRateLimited();
 
     /**

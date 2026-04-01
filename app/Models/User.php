@@ -60,8 +60,10 @@ class User extends Authenticatable
         return $this->hasMany(Document::class);
     }
 
-
-
+    public function mentorProfile()
+    {
+        return $this->hasOne(MentorProfile::class);
+    }
 
 }
 

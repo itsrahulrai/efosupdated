@@ -14,6 +14,10 @@ use App\Http\Controllers\Admin\JobSubCategoryController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\YoutubeVideoController;
+use App\Http\Controllers\Mentor\MentorCategoryController;
+use App\Http\Controllers\Mentor\MentorProfileController;
+use App\Http\Controllers\Mentor\MentorSessionPriceController;
+use App\Http\Controllers\Mentor\MentorAvailabilityController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Franchie\FranchiseController;
 use App\Http\Controllers\HomeController;
@@ -33,6 +37,9 @@ use App\Http\Controllers\LMS\BundleCourseController;
 use App\Http\Controllers\NewsEventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\MentorDashboard;
+
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -300,6 +307,21 @@ Route::middleware(['auth', 'role:admin'])->group(function ()
 
         Route::delete('course-orders/{id}', [CourseOrderController::class, 'destroyOrder'])->name('course-orders.destroy');
 
+
+        // Mentor Platform
+        Route::post('mentor-categories/status', [MentorCategoryController::class, 'updateStatus'])->name('mentor-categories.status');
+        Route::resource('mentor-categories', MentorCategoryController::class);
+        Route::post('mentor-profile/status', [MentorProfileController::class, 'updateStatus'])->name('mentor-profile.status');
+        Route::resource('mentor-profile', MentorProfileController::class);
+        
+        Route::post('mentor-session-price/status', [MentorSessionPriceController::class, 'updateStatus'])->name('mentor-session-price.status');
+        Route::resource('mentor-session-price',MentorSessionPriceController::class )->only(['store','update','destroy']);
+        Route::post('mentor-availability/status', [MentorAvailabilityController::class, 'updateStatus'])->name('mentor-availability.status');
+        Route::resource('mentor-availability',MentorAvailabilityController::class)->only(['store', 'update', 'destroy']);
+
+
+
+
     });
 });
 
@@ -316,6 +338,28 @@ Route::middleware(['auth', 'role:franchise'])->group(function ()
     Route::get('/franchise/students', [FranchiseController::class, 'franchiseStudents'])->name('students.franchise');
     Route::resource('franchise', FranchiseController::class);
 });
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Mentor ROUTES
+|--------------------------------------------------------------------------
+ */
+Route::middleware(['auth', 'role:mentor'])->group(function ()
+{
+    Route::get('/mentor/dashboard',[MentorDashboard::class, 'index'])->name('mentor.dashboard');
+    Route::post('/mentor/profile/update',[MentorDashboard::class, 'MentorProfileupdate'])->name('mentorprofile.update');
+    Route::post('/mentor/password/update',[MentorDashboard::class, 'MentorupdatePassword'])->name('mentor.password.update');
+    Route::get('/mentor/messages', [MentorDashboard::class, 'messages'])->name('mentor.messages');
+
+});
+
+
+
+
+
+
 
 /*
 |--------------------------------------------------------------------------

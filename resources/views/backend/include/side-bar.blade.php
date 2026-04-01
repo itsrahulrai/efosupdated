@@ -15,16 +15,22 @@
         <ul class="menubar">
 
             {{-- ========= COMMON DASHBOARD (ADMIN + FRANCHISE) ========= --}}
-            @if (in_array(auth()->user()->role, ['admin', 'franchise']))
-                <li class="menu-item">
-                    <a class="menu-link open"
-                        href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('franchise.dashboard') }}"
-                        role="button">
-                        <span class="menu-label">Dashboard</span>
-                    </a>
-                </li>
-            @endif
+          @if (in_array(auth()->user()->role, ['admin', 'franchise']))
+            <li class="menu-item">
+                <a class="menu-link open"
+                    href="
+                    @if(auth()->user()->role === 'admin')
+                        {{ route('admin.dashboard') }}
+                    @elseif(auth()->user()->role === 'franchise')
+                        {{ route('franchise.dashboard') }}
+                    @endif
+                    "
+                    role="button">
 
+                    <span class="menu-label">Dashboard</span>
+                </a>
+            </li>
+        @endif
 
             {{-- ================= ADMIN MENU ================= --}}
             @if (auth()->user()->role === 'admin')
@@ -146,6 +152,8 @@
                         </li>
                     </ul>
                 </li>
+
+
                 <li class="menu-heading">
                     <span class="menu-label">LMS Management</span>
                 </li>
@@ -164,7 +172,7 @@
                                 Courses
                             </a>
                         </li>
-                         <li class="menu-item">
+                        <li class="menu-item">
                             <a class="menu-link" href="{{ route('admin.bundle-course.index') }}">
                                 Bundle Courses
                             </a>
@@ -196,6 +204,26 @@
                         </li>
                     </ul>
                 </li>
+
+
+                <li class="menu-heading">
+                    <span class="menu-label">Mentor Platform</span>
+                </li>
+
+                <li class="menu-item menu-arrow">
+                    <a class="menu-link" href="javascript:void(0);" role="button">
+                        <span class="menu-label">Mentors</span>
+                    </a>
+
+                    <ul class="menu-inner">
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{ route('admin.mentor-categories.index') }}">
+                                Mentors
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
 
                 <li class="menu-heading">
                     <span class="menu-label">System Settings</span>
@@ -258,10 +286,5 @@
         </ul>
 
     </nav>
-    <!-- <div class="app-footer">
-        <a href="pages/faq.html" class="btn btn-outline-light waves-effect btn-shadow btn-app-nav w-100">
-            <i class="fi fi-rs-interrogation text-primary"></i>
-            <span class="nav-text">Help and Support</span>
-        </a>
-    </div> -->
+
 </aside>
