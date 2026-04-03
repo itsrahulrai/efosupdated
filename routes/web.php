@@ -38,6 +38,10 @@ use App\Http\Controllers\NewsEventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\MentorDashboard;
+use App\Http\Controllers\MentorController;
+
+
+
 
 
 use Illuminate\Support\Facades\Route;
@@ -113,6 +117,18 @@ Route::get('/course/lesson/{slug}', [HomeController::class, 'lesson'])->name('co
 Route::get('/course/quiz/{id}', [HomeController::class, 'quiz'])->name('course.quiz');
 
 Route::get('find-center', [HomeController::class, 'findCenter'])->name('find.center');
+
+
+
+Route::get('become-a-mentor', [MentorController::class, 'becomeAMentor'])->name('become-a-mentor');
+Route::get('mentorship', [MentorController::class, 'mentorship'])->name('mentorship');
+
+Route::post('/become-mentor',[MentorController::class, 'storeMentor'])->name('mentor.store');
+Route::get('/mentorship-details/{slug}',[MentorController::class, 'mentorshipDetails'])->name('mentorship-details');
+
+
+
+
 
 // Studnet Route
 
@@ -318,7 +334,6 @@ Route::middleware(['auth', 'role:admin'])->group(function ()
         Route::resource('mentor-session-price',MentorSessionPriceController::class )->only(['store','update','destroy']);
         Route::post('mentor-availability/status', [MentorAvailabilityController::class, 'updateStatus'])->name('mentor-availability.status');
         Route::resource('mentor-availability',MentorAvailabilityController::class)->only(['store', 'update', 'destroy']);
-
 
 
 

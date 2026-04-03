@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
 
 class MentorProfile extends Model
 {
@@ -13,6 +15,7 @@ class MentorProfile extends Model
         'user_id',
         'mentor_category_id',
         'name',
+        'slug',
         'email',
         'phone',
         'state',
@@ -45,5 +48,18 @@ class MentorProfile extends Model
     public function availabilities()
     {
         return $this->hasMany(MentorAvailability::class, 'mentor_id');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($mentor) {
+            $mentor->slug = Str::slug($mentor->name);
+        });
+
+        static::updating(function ($mentor) {
+            $mentor->slug = Str::slug($mentor->name);
+        });
     }
 }

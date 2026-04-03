@@ -20,6 +20,7 @@
                         ->constrained()
                         ->onDelete('set null');
                 $table->string('name')->nullable();
+                $table->string('slug')->unique()->nullable();
                 $table->string('email')->nullable();
                 $table->string('phone')->nullable();
                 $table->string('state')->nullable();

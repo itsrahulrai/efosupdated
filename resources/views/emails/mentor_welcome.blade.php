@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Welcome to EFOS Mentor Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body style="margin:0; padding:0; background:#f4f6fb; font-family:Arial, sans-serif;">
-
+<body style="margin:0; padding:0; background:#f4f6fb; font-family:'Poppins', Arial, sans-serif;">
+    
     <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6fb; padding:30px 0;">
         <tr>
             <td align="center">

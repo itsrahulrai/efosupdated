@@ -104,6 +104,9 @@
 
                                 <a href="javascript:void(0)">About EFOS <i class="fa-solid fa-angle-down"></i></a>
                                 <ul class="sub-menu">
+                                     <!-- new menu -->
+                                    <li><a href="{{ route('become-a-mentor') }}">Become a Mentor </a></li>
+                                    <li><a href="{{ route('mentorship') }}">Mentorship</a></li>
                                     <li><a href="https://efos.in/missionvision">Mission & Vision </a></li>
                                     <li><a href="https://efos.in/efos-founders">Founders </a></li>
                                     <li><a href="{{ route('find.center') }}">Find Center </a></li>
