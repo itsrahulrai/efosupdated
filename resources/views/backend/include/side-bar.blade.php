@@ -15,22 +15,20 @@
         <ul class="menubar">
 
             {{-- ========= COMMON DASHBOARD (ADMIN + FRANCHISE) ========= --}}
-          @if (in_array(auth()->user()->role, ['admin', 'franchise']))
-            <li class="menu-item">
-                <a class="menu-link open"
-                    href="
-                    @if(auth()->user()->role === 'admin')
-                        {{ route('admin.dashboard') }}
+            @if (in_array(auth()->user()->role, ['admin', 'franchise']))
+                <li class="menu-item">
+                    <a class="menu-link open"
+                        href="
+                    @if (auth()->user()->role === 'admin') {{ route('admin.dashboard') }}
                     @elseif(auth()->user()->role === 'franchise')
-                        {{ route('franchise.dashboard') }}
-                    @endif
+                        {{ route('franchise.dashboard') }} @endif
                     "
-                    role="button">
+                        role="button">
 
-                    <span class="menu-label">Dashboard</span>
-                </a>
-            </li>
-        @endif
+                        <span class="menu-label">Dashboard</span>
+                    </a>
+                </li>
+            @endif
 
             {{-- ================= ADMIN MENU ================= --}}
             @if (auth()->user()->role === 'admin')
@@ -221,6 +219,11 @@
                                 Mentors
                             </a>
                         </li>
+                        <li class="menu-item">
+                            <a class="menu-link" href="{{ route('admin.mentor-session.bookings') }}">
+                                Bookings
+                            </a>
+                        </li>
                     </ul>
                 </li>
 
@@ -257,7 +260,6 @@
                     </ul>
                 </li>
             @endif
-
             {{-- ================= FRANCHISE MENU ================= --}}
             @if (auth()->user()->role === 'franchise')
                 <li class="menu-heading">
@@ -282,9 +284,6 @@
                     </ul>
                 </li>
             @endif
-
         </ul>
-
     </nav>
-
 </aside>

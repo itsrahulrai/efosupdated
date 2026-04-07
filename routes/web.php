@@ -14,14 +14,12 @@ use App\Http\Controllers\Admin\JobSubCategoryController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\YoutubeVideoController;
-use App\Http\Controllers\Mentor\MentorCategoryController;
-use App\Http\Controllers\Mentor\MentorProfileController;
-use App\Http\Controllers\Mentor\MentorSessionPriceController;
-use App\Http\Controllers\Mentor\MentorAvailabilityController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Franchie\FranchiseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\LMS\AssignedCourseController;
+use App\Http\Controllers\LMS\BundleCourseController;
 use App\Http\Controllers\LMS\CertificateController;
 use App\Http\Controllers\LMS\CourseBuyController;
 use App\Http\Controllers\LMS\CourseChapterController;
@@ -32,18 +30,16 @@ use App\Http\Controllers\LMS\QuizController;
 use App\Http\Controllers\LMS\QuizQuestionController;
 use App\Http\Controllers\LMS\StudentLessonController;
 use App\Http\Controllers\LMS\SubjectController;
-use App\Http\Controllers\LMS\AssignedCourseController;
-use App\Http\Controllers\LMS\BundleCourseController;
+use App\Http\Controllers\MentorController;
+use App\Http\Controllers\MentorDashboard;
+use App\Http\Controllers\Mentor\MentorAvailabilityController;
+use App\Http\Controllers\Mentor\MentorCategoryController;
+use App\Http\Controllers\Mentor\MentorProfileController;
+use App\Http\Controllers\Mentor\MentorSessionPriceController;
+use App\Http\Controllers\Mentor\SessionBookingController;
 use App\Http\Controllers\NewsEventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
-use App\Http\Controllers\MentorDashboard;
-use App\Http\Controllers\MentorController;
-
-
-
-
-
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -107,7 +103,6 @@ Route::get('skill-courses', [HomeController::class, 'skillCourses'])->name('skil
 
 Route::get('bundle-courses', [HomeController::class, 'BundleCourses'])->name('bundle-courses');
 
-
 Route::get('/course/{slug}', [HomeController::class, 'coursesDetails'])->name('course.details');
 
 // video / lesson
@@ -118,17 +113,11 @@ Route::get('/course/quiz/{id}', [HomeController::class, 'quiz'])->name('course.q
 
 Route::get('find-center', [HomeController::class, 'findCenter'])->name('find.center');
 
-
-
 Route::get('become-a-mentor', [MentorController::class, 'becomeAMentor'])->name('become-a-mentor');
 Route::get('mentorship', [MentorController::class, 'mentorship'])->name('mentorship');
 
-Route::post('/become-mentor',[MentorController::class, 'storeMentor'])->name('mentor.store');
-Route::get('/mentorship-details/{slug}',[MentorController::class, 'mentorshipDetails'])->name('mentorship-details');
-
-
-
-
+Route::post('/become-mentor', [MentorController::class, 'storeMentor'])->name('mentor.store');
+Route::get('/mentorship-details/{slug}', [MentorController::class, 'mentorshipDetails'])->name('mentorship-details');
 
 // Studnet Route
 
@@ -137,10 +126,11 @@ Route::get('/mentorship-details/{slug}',[MentorController::class, 'mentorshipDet
 //     return view('student.login');
 // })->name('student.login');
 
+Route::get('/student/login', function (Illuminate\Http\Request $request)
+{
 
-Route::get('/student/login', function (Illuminate\Http\Request $request) {
-
-    if ($request->apply_job) {
+    if ($request->apply_job)
+    {
         session(['apply_job' => $request->apply_job]);
     }
 
@@ -152,9 +142,6 @@ Route::get('/student/forgot-password', function ()
 {
     return view('student.forgot-password');
 })->name('student.forgot-password');
-
-
-
 
 Route::resource('login', LoginController::class)->only(['index', 'store', 'create', 'destroy']);
 
@@ -260,7 +247,6 @@ Route::middleware(['auth', 'role:admin'])->group(function ()
         Route::get('student-bulk-assign-template', [AdminStudentController::class, 'downloadStudentBulkAssignTemplate'])->name('bulkassign.students.template');
         Route::post('bulk-students/import', [AdminStudentController::class, 'import'])->name('bulk.students.import');
 
-
         Route::resource('courses', CourseController::class);
 
         Route::post('page/status', [PageController::class, 'toggleStatus'])->name('page.toggle-status');
@@ -281,10 +267,9 @@ Route::middleware(['auth', 'role:admin'])->group(function ()
         Route::post('learning-course/status', [LearningCourseController::class, 'updateStatus'])->name('learning-course.status');
         Route::resource('learning-course', LearningCourseController::class);
 
-
-        Route::post('bundle-course/status',[BundleCourseController::class, 'updateStatus'])->name('bundle-course.status');
+        Route::post('bundle-course/status', [BundleCourseController::class, 'updateStatus'])->name('bundle-course.status');
         Route::resource('bundle-course', BundleCourseController::class);
-        
+
         Route::get('bulk-assign-template', [AssignedCourseController::class, 'downloadBulkAssignTemplate'])->name('assigned-course.template');
         Route::post('assigned-course/import', [AssignedCourseController::class, 'import'])->name('assigned-course.import');
 
@@ -305,11 +290,10 @@ Route::middleware(['auth', 'role:admin'])->group(function ()
         Route::resource('quiz', QuizController::class);
 
         // Download sample excel
-            Route::get('quiz-question-template',[QuizQuestionController::class, 'downloadTemplate'])->name('quiz-question.template');
+        Route::get('quiz-question-template', [QuizQuestionController::class, 'downloadTemplate'])->name('quiz-question.template');
 
-            // Upload excel
-            Route::post('quiz-question-import', [QuizQuestionController::class, 'importQuestions'])->name('quiz-question.import');
-
+        // Upload excel
+        Route::post('quiz-question-import', [QuizQuestionController::class, 'importQuestions'])->name('quiz-question.import');
 
         Route::resource('quiz-question', QuizQuestionController::class);
 
@@ -323,18 +307,25 @@ Route::middleware(['auth', 'role:admin'])->group(function ()
 
         Route::delete('course-orders/{id}', [CourseOrderController::class, 'destroyOrder'])->name('course-orders.destroy');
 
-
         // Mentor Platform
         Route::post('mentor-categories/status', [MentorCategoryController::class, 'updateStatus'])->name('mentor-categories.status');
         Route::resource('mentor-categories', MentorCategoryController::class);
         Route::post('mentor-profile/status', [MentorProfileController::class, 'updateStatus'])->name('mentor-profile.status');
         Route::resource('mentor-profile', MentorProfileController::class);
-        
-        Route::post('mentor-session-price/status', [MentorSessionPriceController::class, 'updateStatus'])->name('mentor-session-price.status');
-        Route::resource('mentor-session-price',MentorSessionPriceController::class )->only(['store','update','destroy']);
-        Route::post('mentor-availability/status', [MentorAvailabilityController::class, 'updateStatus'])->name('mentor-availability.status');
-        Route::resource('mentor-availability',MentorAvailabilityController::class)->only(['store', 'update', 'destroy']);
 
+        Route::post('mentor-session-price/status', [MentorSessionPriceController::class, 'updateStatus'])->name('mentor-session-price.status');
+        Route::resource('mentor-session-price', MentorSessionPriceController::class)->only(['store', 'update', 'destroy']);
+        Route::post('mentor-availability/status', [MentorAvailabilityController::class, 'updateStatus'])->name('mentor-availability.status');
+        Route::resource('mentor-availability', MentorAvailabilityController::class)->only(['store', 'update', 'destroy']);
+
+        // Session Bookings
+        Route::get('session/bookings', [SessionBookingController::class, 'sessionBookings'])->name('mentor-session.bookings');
+        Route::post('/session-booking/status',[SessionBookingController::class, 'updateStatus'])->name('session-booking.status');
+
+        Route::post('/session-booking/update-meeting',[SessionBookingController::class, 'updateMeeting'])->name('session-booking.updateMeeting');
+
+
+        
 
 
     });
@@ -354,8 +345,6 @@ Route::middleware(['auth', 'role:franchise'])->group(function ()
     Route::resource('franchise', FranchiseController::class);
 });
 
-
-
 /*
 |--------------------------------------------------------------------------
 | Mentor ROUTES
@@ -363,18 +352,28 @@ Route::middleware(['auth', 'role:franchise'])->group(function ()
  */
 Route::middleware(['auth', 'role:mentor'])->group(function ()
 {
-    Route::get('/mentor/dashboard',[MentorDashboard::class, 'index'])->name('mentor.dashboard');
-    Route::post('/mentor/profile/update',[MentorDashboard::class, 'MentorProfileupdate'])->name('mentorprofile.update');
-    Route::post('/mentor/password/update',[MentorDashboard::class, 'MentorupdatePassword'])->name('mentor.password.update');
+    Route::get('/mentor/dashboard', [MentorDashboard::class, 'index'])->name('mentor.dashboard');
+    Route::post('/mentor/profile/update', [MentorDashboard::class, 'MentorProfileupdate'])->name('mentorprofile.update');
+    Route::post('/mentor/password/update', [MentorDashboard::class, 'MentorupdatePassword'])->name('mentor.password.update');
     Route::get('/mentor/messages', [MentorDashboard::class, 'messages'])->name('mentor.messages');
 
+    Route::post('/mentor/price/store', [MentorDashboard::class, 'storePrice'])->name('mentorprice.store');
+    Route::post('/mentor/price/update/{id}', [MentorDashboard::class, 'updatePrice'])->name('mentorprice.update');
+    Route::get('/mentor/price/delete/{id}', [MentorDashboard::class, 'deletePrice'])->name('mentorprice.delete');
+
+    Route::post('/mentor/slot/store',[MentorDashboard::class, 'storeSlot'])->name('mentorslot.store');
+    Route::post('/mentor/slot/update/{id}',[MentorDashboard::class, 'updateSlot'])->name('mentorslot.update');
+    Route::get('/mentor/slot/delete/{id}',[MentorDashboard::class, 'deleteSlot'])->name('mentorslot.delete');
+
+    Route::post('mentor/update-booking-status',[MentorDashboard::class, 'updateBookingStatus'])->name('update.booking.status');
+
+    
+    Route::get('mentor/booking/{id}',[MentorDashboard::class, 'getBooking'])->name('fetched.booking');
+
+    Route::post('mentor/update-meeting',[MentorDashboard::class, 'updateBookingMeeting'])->name('update.booking.meeting');
+
+
 });
-
-
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -411,40 +410,31 @@ Route::middleware(['auth', 'role:student'])->group(function ()
     Route::get('/course/{course}/enroll-free', [CourseBuyController::class, 'enrollFree'])->name('course.enroll.free');
     Route::get('/bundle/enroll-free/{bundle}', [CourseBuyController::class, 'enrollBundleFree'])->name('bundle.enroll.free');
 
-
     // Paid course checkout
     Route::get('/course/{course}/checkout', [CourseBuyController::class, 'checkout'])->name('course.checkout');
 
-
-   Route::get('/bundle/checkout/{bundle}', [CourseBuyController::class, 'bundleCheckout'])
-    ->name('bundle.course.checkout');
-
+    Route::get('/bundle/checkout/{bundle}', [CourseBuyController::class, 'bundleCheckout'])
+        ->name('bundle.course.checkout');
 
     Route::post('/payment/initiate/{course}', [CourseBuyController::class, 'initiatePayment'])->name('payment.initiate');
 
     Route::post('/bundle/payment/initiate/{bundle}', [CourseBuyController::class, 'initiateBundlePayment'])
-    ->name('bundle.payment.initiate');
+        ->name('bundle.payment.initiate');
 
-  
     Route::get('/bundle/payment/success', [CourseBuyController::class, 'bundlePaymentSuccess'])
         ->name('bundle.payment.success');
-
 
     Route::get('/bundle/payment/failure', [CourseBuyController::class, 'bundlePaymentFailure'])
         ->name('bundle.payment.failure');
 
-
     Route::get('/bundle/thankyou/{courseBuy}', [CourseBuyController::class, 'bundleThankYou'])
         ->name('bundle.thankyou');
 
-
-
-
     Route::post('/quiz/{quiz}/submit', [StudentController::class, 'quizStore'])->name('quiz.submit');
-
     Route::get('certificates/{id}/print', [StudentController::class, 'print'])->name('certificate.print');
-
     Route::post('lesson/complete/{lesson}', [StudentLessonController::class, 'markComplete'])->name('lesson.complete');
+
+    Route::post('/book-session', [MentorController::class, 'bookSession'])->name('book.session');
 
 });
 

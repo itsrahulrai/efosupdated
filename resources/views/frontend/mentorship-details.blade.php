@@ -187,8 +187,17 @@
         }
 
         @keyframes pulse-gradient {
-            0%, 100% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.1); opacity: 0.9; }
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.9;
+            }
         }
 
         .price {
@@ -353,15 +362,24 @@
             overflow: visible;
         }
 
-        .content-card:nth-child(1) { animation-delay: 0.1s; }
-        .content-card:nth-child(2) { animation-delay: 0.2s; }
-        .content-card:nth-child(3) { animation-delay: 0.3s; }
+        .content-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .content-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .content-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
                 transform: translateY(24px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -418,6 +436,7 @@
             line-height: 1.8;
             margin-bottom: 20px;
         }
+
 
         /* About Section */
         .about-text {
@@ -583,6 +602,7 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -770,6 +790,107 @@
                 font-size: 14px;
             }
         }
+
+        /* duration  */
+        .duration-selector {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        /* button */
+        .duration-btn {
+            padding: 5px 5px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            background: #fff;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: .25s;
+            min-width: 110px;
+            text-align: center;
+            position: relative;
+
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* duration text */
+        .duration-time {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        /* price */
+        .price-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #E72434;
+            opacity: 1;
+        }
+
+        /* hover effect */
+        .duration-btn:hover {
+            border-color: #E72434;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(231, 36, 52, 0.15);
+        }
+
+        /* active button */
+        .duration-btn.active {
+            background: #E72434;
+            border-color: #E72434;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(231, 36, 52, 0.25);
+        }
+
+        /* active price */
+        .duration-btn.active .price-text {
+            color: #fff;
+        }
+
+        /* mobile */
+        @media(max-width:576px) {
+
+            .duration-btn {
+                flex: 1 1 45%;
+            }
+
+        }
+
+
+
+        .slot.available {
+            background: #ECFDF5;
+            border-color: #10B981;
+            color: #059669;
+        }
+
+        .slot.booked {
+            background: #f3f4f6;
+            border-color: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .slot.booked::after {
+            content: "Booked";
+            font-size: 10px;
+            position: absolute;
+            bottom: 4px;
+            right: 6px;
+            color: #9ca3af;
+        }
+
+        .slot.active {
+            background: #E72434;
+            border-color: #E72434;
+            color: #fff;
+        }
     </style>
 @endpush
 
@@ -800,16 +921,15 @@
 
                         <!-- Profile -->
                         <div class="profile-card">
-                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop"
-                                alt="Rida Louiss" class="mentor-img">
-                            <div class="mentor-name">Rida Louiss</div>
-                            <div class="mentor-role">Senior Product Mentor</div>
+                            <img src="{{ static_asset($mentor->profile_photo) }}" alt="Rida Louiss" class="mentor-img">
+                            <div class="mentor-name">{{ $mentor->name }}</div>
+                            <div class="mentor-role">{{ $mentor->category->name }}</div>
                         </div>
 
                         <!-- Meta Info -->
                         <div class="mentor-meta">
                             <div class="meta-item">
-                                <span><strong>London</strong>, United Kingdom</span>
+                                <span><strong>London</strong>, {{ $mentor->city }}, {{ $mentor->state }}</span>
                             </div>
                             <div class="meta-item">
                                 <span><strong>Verified</strong> Mentor</span>
@@ -826,11 +946,11 @@
                         <div class="btn-group">
                             <button class="btn btn-secondary">Send Message</button>
                         </div>
-                        
+
                         <!-- Stats -->
                         <div class="stats-grid">
                             <div class="stat-box">
-                                <div class="stat-number">10+</div>
+                                <div class="stat-number">{{ $mentor->experience }}</div>
                                 <div class="stat-label">Years of Experience</div>
                             </div>
                             <div class="stat-box">
@@ -848,10 +968,7 @@
                         <div class="content-card">
                             <div class="card-title">About Mentor</div>
                             <p class="about-text">
-                                I am a Senior Product Designer with over a decade of experience in building user-centric
-                                digital products. I've worked with leading tech companies and startups to transform ideas
-                                into successful products that impact millions of users. My passion is helping the next
-                                generation of designers achieve their career goals.
+                                {!! $mentor->bio !!}
                             </p>
                         </div>
 
@@ -859,92 +976,83 @@
                         <div class="content-card">
                             <div class="card-title">Mentorship Expertise</div>
                             <div class="skills-container">
-                                <div class="skill-tag">Product Strategy</div>
-                                <div class="skill-tag">Career Growth</div>
-                                <div class="skill-tag">UX Design</div>
-                                <div class="skill-tag">Portfolio Review</div>
-                                <div class="skill-tag">Interview Prep</div>
-                                <div class="skill-tag">Team Leadership</div>
-                                <div class="skill-tag">User Research</div>
-                                <div class="skill-tag">Design Systems</div>
+                                @foreach (explode(',', $mentor->skills) as $skill)
+                                    <div class="skill-tag">{{ trim($skill) }}</div>
+                                @endforeach
                             </div>
                         </div>
 
                         <!-- Available Slots -->
                         <div class="content-card">
-                            <div class="card-title">Available Time Slots</div>
-                            <p class="card-text">Select a day and time that works best for you</p>
-                            
-                            <!-- Day Selector -->
-                            <div class="days-selector">
-                                <button class="day-btn active" data-day="0">
-                                    <span class="day-name">Monday</span>
-                                    <span class="day-date">Jan 6</span>
-                                </button>
-                                <button class="day-btn" data-day="1">
-                                    <span class="day-name">Tuesday</span>
-                                    <span class="day-date">Jan 7</span>
-                                </button>
-                                <button class="day-btn" data-day="2">
-                                    <span class="day-name">Wednesday</span>
-                                    <span class="day-date">Jan 8</span>
-                                </button>
-                                <button class="day-btn" data-day="3">
-                                    <span class="day-name">Thursday</span>
-                                    <span class="day-date">Jan 9</span>
-                                </button>
-                                <button class="day-btn" data-day="4">
-                                    <span class="day-name">Friday</span>
-                                    <span class="day-date">Jan 10</span>
-                                </button>
+                            <div class="card-title">Book Your Preferred Time</div>
+                            <p class="card-text">Pick a duration, choose a day, and select a time slot</p>
+
+                            <div class="duration-selector">
+
+                                @foreach ($availabilitySlots as $duration => $days)
+                                    @php
+                                        $price = optional(
+                                            $mentor->sessionPrices->where('duration_minutes', $duration)->first(),
+                                        )->discount_price;
+                                    @endphp
+
+                                    <button class="duration-btn {{ $loop->first ? 'active' : '' }}"
+                                        data-duration="{{ $duration }}">
+
+                                        <div class="duration-time">
+                                            {{ $duration }} min
+                                        </div>
+
+                                        <span class="price-text">
+                                            ₹ {{ rtrim(rtrim(number_format($price, 2), '0'), '.') }}
+                                        </span>
+
+                                    </button>
+                                @endforeach
+
                             </div>
 
+
+                            <!-- Day Selector -->
+                            <div class="days-selector">
+
+                                @foreach ($availabilitySlots as $duration => $days)
+                                    @if ($loop->first)
+                                        @foreach ($days as $day => $slots)
+                                            <button class="day-btn {{ $loop->first ? 'active' : '' }}"
+                                                data-day="{{ $loop->index }}">
+
+                                                {{ ucfirst($day) }}
+
+                                            </button>
+                                        @endforeach
+                                    @endif
+                                @endforeach
+
+                            </div>
                             <!-- Time Slots -->
-                            <div class="slots-grid" id="slotsContainer">
-                                <div class="slot" data-day="0">10:00 AM</div>
-                                <div class="slot" data-day="0">10:30 AM</div>
-                                <div class="slot" data-day="0">11:00 AM</div>
-                                <div class="slot" data-day="0">11:30 AM</div>
-                                <div class="slot" data-day="0">12:00 PM</div>
-                                <div class="slot" data-day="0">2:00 PM</div>
-                                <div class="slot" data-day="0">2:30 PM</div>
-                                <div class="slot" data-day="0">3:00 PM</div>
 
-                                <div class="slot" data-day="1" style="display:none;">9:00 AM</div>
-                                <div class="slot" data-day="1" style="display:none;">9:30 AM</div>
-                                <div class="slot" data-day="1" style="display:none;">10:00 AM</div>
-                                <div class="slot" data-day="1" style="display:none;">10:30 AM</div>
-                                <div class="slot" data-day="1" style="display:none;">1:00 PM</div>
-                                <div class="slot" data-day="1" style="display:none;">1:30 PM</div>
-                                <div class="slot" data-day="1" style="display:none;">3:00 PM</div>
-                                <div class="slot" data-day="1" style="display:none;">3:30 PM</div>
+                            <div class="slots-grid">
 
-                                <div class="slot" data-day="2" style="display:none;">10:00 AM</div>
-                                <div class="slot" data-day="2" style="display:none;">11:00 AM</div>
-                                <div class="slot" data-day="2" style="display:none;">12:00 PM</div>
-                                <div class="slot" data-day="2" style="display:none;">2:00 PM</div>
-                                <div class="slot" data-day="2" style="display:none;">2:30 PM</div>
-                                <div class="slot" data-day="2" style="display:none;">3:00 PM</div>
-                                <div class="slot" data-day="2" style="display:none;">4:00 PM</div>
-                                <div class="slot" data-day="2" style="display:none;">4:30 PM</div>
+                                @foreach ($availabilitySlots as $duration => $days)
+                                    @foreach ($days as $day => $slots)
+                                        @foreach ($slots as $slot)
+                                            @php
+                                                $isBooked = in_array($slot, $bookedSlots[$day] ?? []);
+                                            @endphp
 
-                                <div class="slot" data-day="3" style="display:none;">9:30 AM</div>
-                                <div class="slot" data-day="3" style="display:none;">10:00 AM</div>
-                                <div class="slot" data-day="3" style="display:none;">10:30 AM</div>
-                                <div class="slot" data-day="3" style="display:none;">11:00 AM</div>
-                                <div class="slot" data-day="3" style="display:none;">2:30 PM</div>
-                                <div class="slot" data-day="3" style="display:none;">3:00 PM</div>
-                                <div class="slot" data-day="3" style="display:none;">3:30 PM</div>
-                                <div class="slot" data-day="3" style="display:none;">4:00 PM</div>
+                                            <div class="slot
+                                                {{ $isBooked ? 'booked' : 'available' }}"
+                                                data-duration="{{ $duration }}" data-day="{{ $loop->parent->index }}"
+                                                style="{{ $loop->parent->first && $loop->parent->parent->first ? '' : 'display:none' }}">
 
-                                <div class="slot" data-day="4" style="display:none;">10:00 AM</div>
-                                <div class="slot" data-day="4" style="display:none;">10:30 AM</div>
-                                <div class="slot" data-day="4" style="display:none;">11:30 AM</div>
-                                <div class="slot" data-day="4" style="display:none;">1:00 PM</div>
-                                <div class="slot" data-day="4" style="display:none;">1:30 PM</div>
-                                <div class="slot" data-day="4" style="display:none;">2:00 PM</div>
-                                <div class="slot" data-day="4" style="display:none;">3:00 PM</div>
-                                <div class="slot" data-day="4" style="display:none;">3:30 PM</div>
+                                                {{ $slot }}
+
+                                            </div>
+                                        @endforeach
+                                    @endforeach
+                                @endforeach
+
                             </div>
 
                             <!-- Selected Time Display & Book Button -->
@@ -953,105 +1061,15 @@
                                     <span class="info-label">Selected Time:</span>
                                     <span class="info-value" id="selectedTimeDisplay">No time selected</span>
                                 </div>
+                                <input type="hidden" id="mentor_id" value="{{ $mentor->id }}">
+                                <input type="hidden" id="session_price_id">
+                                <input type="hidden" id="final_price">
                                 <button class="btn-book-session" id="bookBtn" disabled>
                                     <i class="fa-solid fa-calendar-check"></i>
                                     Book a Session
                                 </button>
                             </div>
                         </div>
-
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const dayBtns = document.querySelectorAll('.day-btn');
-                                const slots = document.querySelectorAll('.slot');
-                                const bookBtn = document.getElementById('bookBtn');
-                                const selectedTimeDisplay = document.getElementById('selectedTimeDisplay');
-                                const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-                                const dayDates = ['Jan 6', 'Jan 7', 'Jan 8', 'Jan 9', 'Jan 10'];
-                                
-                                let selectedDay = 0;
-                                let selectedTime = null;
-
-                                dayBtns.forEach(btn => {
-                                    btn.addEventListener('click', function() {
-                                        const day = parseInt(this.dataset.day);
-                                        selectedDay = day;
-                                        selectedTime = null;
-
-                                        // Update active button
-                                        dayBtns.forEach(b => b.classList.remove('active'));
-                                        this.classList.add('active');
-
-                                        // Show/hide slots with animation
-                                        slots.forEach(slot => {
-                                            const slotDay = parseInt(slot.dataset.day);
-                                            if (slotDay === day) {
-                                                slot.style.display = 'flex';
-                                                slot.classList.add('show-slot');
-                                                slot.classList.remove('active');
-                                            } else {
-                                                slot.style.display = 'none';
-                                                slot.classList.remove('show-slot');
-                                            }
-                                        });
-
-                                        // Reset display
-                                        updateSelectedTimeDisplay();
-                                    });
-                                });
-
-                                // Slot selection
-                                slots.forEach(slot => {
-                                    slot.addEventListener('click', function() {
-                                        // Only select if visible (for current day)
-                                        if (this.style.display !== 'none') {
-                                            // Remove active from other slots
-                                            slots.forEach(s => s.classList.remove('active'));
-                                            // Add active to clicked slot
-                                            this.classList.add('active');
-                                            
-                                            selectedTime = this.textContent.trim();
-                                            updateSelectedTimeDisplay();
-                                        }
-                                    });
-                                });
-
-                                function updateSelectedTimeDisplay() {
-                                    if (selectedTime) {
-                                        selectedTimeDisplay.textContent = `${dayNames[selectedDay]}, ${dayDates[selectedDay]} at ${selectedTime}`;
-                                        bookBtn.disabled = false;
-                                    } else {
-                                        selectedTimeDisplay.textContent = 'No time selected';
-                                        bookBtn.disabled = true;
-                                    }
-                                }
-
-                                // Book button click
-                                bookBtn.addEventListener('click', function() {
-                                    if (selectedTime) {
-                                        const bookingDetails = {
-                                            day: dayNames[selectedDay],
-                                            date: dayDates[selectedDay],
-                                            time: selectedTime,
-                                            mentor: 'Rida Louiss'
-                                        };
-                                        
-                                        // Show confirmation
-                                        alert(`Session Booked!\n\nMentor: ${bookingDetails.mentor}\nDate: ${bookingDetails.day}, ${bookingDetails.date}\nTime: ${bookingDetails.time}\n\nYou will receive a confirmation email shortly.`);
-                                        
-                                        // Here you can submit to backend
-                                        console.log('Booking Details:', bookingDetails);
-                                        
-                                        // Example: Send to backend
-                                        // fetch('/api/bookings', {
-                                        //     method: 'POST',
-                                        //     headers: {'Content-Type': 'application/json'},
-                                        //     body: JSON.stringify(bookingDetails)
-                                        // });
-                                    }
-                                });
-                            });
-                        </script>
 
                     </div>
 
@@ -1062,3 +1080,207 @@
     </main>
 
 @endsection
+
+@push('script')
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            let activeDuration =
+                document.querySelector(".duration-btn").dataset.duration;
+
+            let activeDay = 0;
+
+            let selectedSlot = null;
+
+            const durationBtns =
+                document.querySelectorAll(".duration-btn");
+
+            const dayBtns =
+                document.querySelectorAll(".day-btn");
+
+            const slots =
+                document.querySelectorAll(".slot");
+
+            const selectedText =
+                document.getElementById("selectedTimeDisplay");
+
+            const bookBtn =
+                document.getElementById("bookBtn");
+
+
+            /* duration change */
+
+            durationBtns.forEach(btn => {
+
+                btn.addEventListener("click", function() {
+
+                    durationBtns.forEach(b =>
+                        b.classList.remove("active")
+                    );
+
+                    this.classList.add("active");
+
+                    activeDuration = this.dataset.duration;
+
+                    selectedSlot = null;
+
+                    selectedText.innerText =
+                        "No time selected";
+
+                    bookBtn.disabled = true;
+
+                    filterSlots();
+
+                });
+
+            });
+
+
+            /* day change */
+
+            dayBtns.forEach(btn => {
+
+                btn.addEventListener("click", function() {
+
+                    dayBtns.forEach(b =>
+                        b.classList.remove("active")
+                    );
+
+                    this.classList.add("active");
+
+                    activeDay = this.dataset.day;
+
+                    selectedSlot = null;
+
+                    selectedText.innerText =
+                        "No time selected";
+
+                    bookBtn.disabled = true;
+
+                    filterSlots();
+
+                });
+
+            });
+
+
+            /* slot select */
+
+            slots.forEach(slot => {
+
+                slot.addEventListener("click", function() {
+
+                    if (
+                        !this.classList.contains("booked") &&
+                        this.style.display !== "none"
+                    ) {
+
+                        slots.forEach(s =>
+                            s.classList.remove("active")
+                        );
+
+                        this.classList.add("active");
+
+                        selectedSlot = this.innerText;
+
+                        selectedText.innerText =
+                            selectedSlot +
+                            " (" + activeDuration + " min)";
+
+                        bookBtn.disabled = false;
+
+                    }
+
+                });
+
+            });
+
+            function filterSlots() {
+
+                slots.forEach(slot => {
+
+                    if (
+                        slot.dataset.duration == activeDuration &&
+                        slot.dataset.day == activeDay
+                    ) {
+                        slot.style.display = "flex";
+                    } else {
+                        slot.style.display = "none";
+                    }
+
+                });
+
+            }
+
+                /* AJAX booking */
+
+            bookBtn.addEventListener("click", function() {
+
+                fetch(
+                        "{{ route('book.session') }}", {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json",
+
+                                "X-CSRF-TOKEN": document
+                                    .querySelector('meta[name="csrf-token"]')
+                                    .getAttribute("content")
+                            },
+
+                            body: JSON.stringify({
+
+                                mentor_id: document
+                                    .getElementById("mentor_id").value,
+
+                                duration: activeDuration,
+
+                                day: document
+                                    .querySelector(".day-btn.active")
+                                    .innerText
+                                    .toLowerCase(),
+
+                                time: selectedSlot
+
+                            })
+
+                        })
+
+                    .then(response => response.json())
+
+                    .then(data => {
+
+                        if (data.status) {
+
+                            toastr.success(
+                                data.message
+                            );
+
+                            setTimeout(() => {
+
+                                location.reload();
+
+                            }, 1500);
+
+                        } else {
+
+                            toastr.error(
+                                data.message
+                            );
+
+                        }
+
+                    })
+
+                    .catch(error => {
+
+                        toastr.error(
+                            "Something went wrong"
+                        );
+
+                    });
+
+            });
+        });
+    </script>
+@endpush

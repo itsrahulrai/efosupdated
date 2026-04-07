@@ -30,7 +30,7 @@ class MentorProfileController extends Controller
      */
     public function create()
     {
-        return view('backend.mentor.profile.create');
+       
 
     }
 
@@ -38,59 +38,8 @@ class MentorProfileController extends Controller
      * Store a newly created resource in storage.
      */
 
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'mentor_category_id' => 'required',
-    //         'name' => 'required',
-    //         'email' => 'required|email|unique:users,email',
-    //         'phone' => 'required|digits:10|unique:users,phone',
-    //         'state' => 'nullable',
-    //         'city' => 'nullable',
-    //         'zip_code' => 'nullable',
-    //         'address' => 'nullable',
-    //         'bio' => 'nullable',
-    //         'skills' => 'nullable',
-    //         'experience' => 'nullable',
-    //         'profile_photo' => 'nullable|image',
-    //     ]);
-
-    //     //upload image
-    //     $imagePath = $this->uploadImage($request, 'profile_photo', 'uploads/mentor');
-    //     $password = $request->phone;
-    //     $user = User::create([
-    //         'name' => $request->name,
-    //         'email' => $request->email,
-    //         'phone' => $request->phone,
-    //         'password' => Hash::make($password),
-    //         'role' => 'mentor',
-
-    //     ]);
-
-    //     //create mentor profile
-    //     MentorProfile::create([
-    //         'user_id' => $user->id,
-    //         'mentor_category_id' => $request->mentor_category_id,
-    //         'name' => $request->name,
-    //         'email' => $request->email,
-    //         'phone' => $request->phone,
-    //         'state' => $request->state,
-    //         'city' => $request->city,
-    //         'zip_code' => $request->zip_code,
-    //         'address' => $request->address,
-    //         'bio' => $request->bio,
-    //         'skills' => $request->skills,
-    //         'experience' => $request->experience,
-    //         'profile_photo' => $imagePath,
-    //         'status' => 'approved',
-    //     ]);
-
-    //     return redirect()->route('admin.mentor-categories.index')->with('success', 'Mentor Profile created successfully. Login password is phone number');
-    // }
-
     public function store(Request $request)
     {
-
         $request->validate([
             'mentor_category_id' => 'required',
             'name' => 'required',
@@ -100,6 +49,7 @@ class MentorProfileController extends Controller
             'city' => 'nullable',
             'zip_code' => 'nullable',
             'address' => 'nullable',
+            'shortbio' => 'nullable|max:500',
             'bio' => 'nullable',
             'skills' => 'nullable',
             'experience' => 'nullable',
@@ -129,6 +79,7 @@ class MentorProfileController extends Controller
             'zip_code' => $request->zip_code,
             'address' => $request->address,
             'bio' => $request->bio,
+            'shortbio' => $request->shortbio,
             'skills' => $request->skills,
             'experience' => $request->experience,
             'profile_photo' => $imagePath,
@@ -164,7 +115,7 @@ class MentorProfileController extends Controller
      */
     public function edit(string $id)
     {
-        return view('backend.mentor.profile.create');
+        
 
     }
 
@@ -185,6 +136,7 @@ class MentorProfileController extends Controller
             'city' => 'nullable',
             'zip_code' => 'nullable',
             'address' => 'nullable',
+            'shortbio' => 'nullable|max:500',
             'bio' => 'nullable',
             'skills' => 'nullable',
             'experience' => 'nullable',
@@ -207,6 +159,7 @@ class MentorProfileController extends Controller
             'city' => $request->city,
             'zip_code' => $request->zip_code,
             'address' => $request->address,
+            'shortbio' => $request->shortbio,
             'bio' => $request->bio,
             'skills' => $request->skills,
             'experience' => $request->experience,

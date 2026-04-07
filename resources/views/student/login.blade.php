@@ -126,7 +126,6 @@
                     <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
                         Login
                     </button>
-                    <!-- <a href="{{ route('student-registration') }}"><p class="btn btn-primary mt-3">Sign up</p></a> -->
                     <div class="d-grid mt-3">
                         <a href="{{ route('student-registration') }}" class="btn btn-outline-primary fw-semibold">
                             New Candidate Registration

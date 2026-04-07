@@ -58,6 +58,7 @@
                                         '{{ $mentor->phone }}',
                                         '{{ $mentor->experience }}',
                                         `{{ $mentor->skills }}`,
+                                        `{{ $mentor->shortbio }}`,
                                         `{{ $mentor->bio }}`,
                                         `{{ $mentor->state }}`,
                                         `{{ $mentor->city }}`,
@@ -166,6 +167,13 @@
                             <label>Skills</label>
                             <input type="text" name="skills" id="mentor_skills" class="form-control">
                         </div>
+                         {{-- bio --}}
+                       
+                          <div class="col-md-12 mb-3">
+                            <label>Short Bio</label>
+                            <textarea name="shortbio" id="short_bio" class="form-control" rows="3"></textarea>
+                        </div>
+
                         {{-- bio --}}
                         <div class="col-md-12 mb-3">
                             <label>Bio</label>
@@ -227,39 +235,24 @@
         }
 
 
-
         function openCreateMentorModal() {
-
             $('#mentorModalTitle').text('Add Mentor');
-
             $('#mentorForm').attr(
-
                 'action',
-
                 "{{ route('admin.mentor-profile.store') }}"
-
             );
 
+             $('#short_bio').val('');
             $('#mentorFormMethod').val('');
-
-
-
             $('#mentor_category_id').val('');
-
             $('#mentor_name').val('');
-
             $('#mentor_email').val('');
-
             $('#mentor_phone').val('');
-
             $('#mentor_experience').val('');
-
             $('#mentor_skills').val('');
-
-            $('#mentor_bio').val('');
-
-
-
+            if (joditBio) {
+                joditBio.value = '';
+            }
             $('#mentorModal').modal('show');
 
         }
@@ -274,17 +267,15 @@
             phone,
             experience,
             skills,
+            shortbio,
             bio,
             state,
             city,
             zip_code,
             address,
             photo
-
         ) {
-
             $('#mentorModalTitle').text('Edit Mentor');
-
             let updateUrl =
                 "{{ route('admin.mentor-profile.update', ':id') }}";
 
@@ -296,24 +287,49 @@
             $('#mentor_email').val(email);
             $('#mentor_phone').val(phone);
             $('#mentor_experience').val(experience);
-            $('#mentor_skills').val(skills);
-            $('#mentor_bio').val(bio);
+           $('#mentor_skills').val(skills);
+                $('#short_bio').val(shortbio);
+
+                if (joditBio) {
+                    joditBio.value = bio;
+                }
+            // important
+            if (joditBio) {
+                joditBio.value = bio;
+            }
             $('#mentor_state').val(state);
             $('#mentor_city').val(city);
             $('#mentor_zip').val(zip_code);
             $('#mentor_address').val(address);
             if (photo) {
-
-                $('#photoPreview')
-                    .attr('src', photo)
-                    .show();
-
+                $('#photoPreview').attr('src', photo).show();
             } else {
                 $('#photoPreview').hide();
             }
-
             $('#mentorModal').modal('show');
 
         }
+    </script>
+
+    <script>
+        let joditBio;
+        document.addEventListener('DOMContentLoaded', function() {
+            const mentor_bio = document.getElementById('mentor_bio');
+            if (mentor_bio) {
+
+                joditBio = new Jodit(mentor_bio, {
+                    height: 300,
+                    toolbarAdaptive: false,
+                    buttons: [
+                        'bold', 'italic', 'underline',
+                        '|', 'ul', 'ol',
+                        '|', 'link', 'image',
+                        '|', 'align', 'undo', 'redo'
+                    ]
+                });
+
+            }
+
+        });
     </script>
 @endpush

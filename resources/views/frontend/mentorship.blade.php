@@ -369,21 +369,22 @@
                                 <img src="{{ static_asset($mentor->profile_photo ?? 'assets/images/default-user.png') }}"
                                     alt="{{ $mentor->name }}" class="mentor-card__image">
                                 <div class="mentor-card__experience">
-                                    {{ $mentor->experience ?? ' ' }}
+                                    {{ $mentor->experience ?? '0' }} Years of Experience
                                 </div>
                             </div>
                             <!-- content -->
                             <div class="mentor-card__content">
                                 <!-- header -->
                                 <div class="mentor-card__header">
-                                    <h3 class="mentor-card__name">
-                                        {{ $mentor->name }}
+                                   <h3 class="mentor-card__name">
+                                        <a href="{{ route('mentorship-details', $mentor->slug) }}">
+                                            {{ $mentor->name }}
+                                        </a>
                                     </h3>
                                     <div class="mentor-card__role">
                                         <span class="mentor-card__title">
                                             {{ $mentor->category->name ?? ' ' }}
                                         </span>
-                                        
 
                                     </div>
 
@@ -393,18 +394,16 @@
                                 <!-- bio -->
                                 <p class="mentor-card__bio">
 
-                                    {{ $mentor->bio ?? 'Expert mentor helping students achieve career success.' }}
+                                    {{ $mentor->shortbio ?? 'Expert mentor helping students achieve career success.' }}
 
                                 </p>
 
-
                                 <!-- button -->
-                                <button class="mentor-card__btn">
-
+                                <button class="mentor-card__btn"
+                                onclick="window.location.href='{{ route('mentorship-details', $mentor->slug) }}'">
                                     Book Session →
 
                                 </button>
-
 
                             </div>
 

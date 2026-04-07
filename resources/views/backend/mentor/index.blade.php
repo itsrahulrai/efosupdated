@@ -68,15 +68,6 @@
                                                 <span>Availability</span>
                                             </button>
                                         </li>
-
-                                        <li class="nav-item">
-                                            <button
-                                                class="nav-link d-flex align-items-center justify-content-center gap-1 fw-semibold"
-                                                data-bs-toggle="tab" data-bs-target="#tab-bookings">
-                                                <i class="bi bi-award"></i>
-                                                <span>Bookings</span>
-                                            </button>
-                                        </li>
                                     </ul>
                                 </div>
 
@@ -96,11 +87,6 @@
                                       <div class="tab-pane fade" id="tab-availability">
                                          @include('backend.mentor.availability.index')
                                     </div>
-
-                                    <div class="tab-pane fade" id="tab-bookings">
-                                    
-                                    </div>
-
                                 </div>
 
                             </div>

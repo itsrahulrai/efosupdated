@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -9,15 +10,27 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, $role)
     {
+        // not logged in
         if (!Auth::check()) {
-            return redirect('/login');
+            return redirect()->route('login')
+                ->with('error', 'Please login first.');
         }
 
+        // wrong role (example admin trying student route)
         if (Auth::user()->role !== $role) {
-            abort(403, 'Unauthorized access');
+
+            // if admin logged in, redirect admin dashboard
+            if (Auth::user()->role == 'admin') {
+
+                return redirect()->route('admin.dashboard')
+                    ->with('error', 'Please login as Student to enroll free course.');
+            }
+
+            // default redirect back
+            return redirect()->back()
+                ->with('error', 'Unauthorized access.');
         }
 
         return $next($request);
     }
 }
-

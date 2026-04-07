@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-
 class MentorProfile extends Model
 {
     use HasFactory;
@@ -22,6 +21,7 @@ class MentorProfile extends Model
         'city',
         'zip_code',
         'address',
+        'shortbio',
         'bio',
         'skills',
         'experience',
@@ -54,12 +54,26 @@ class MentorProfile extends Model
     {
         parent::boot();
 
-        static::creating(function ($mentor) {
-            $mentor->slug = Str::slug($mentor->name);
+        static::saving(function ($mentor)
+        {
+
+            if (!empty($mentor->name))
+            {
+
+                $slug = Str::slug($mentor->name);
+
+                // check duplicate slug
+                $count = self::where('slug', 'LIKE', "{$slug}%")
+                    ->where('id', '!=', $mentor->id)
+                    ->count();
+
+                $mentor->slug = $count
+                ? "{$slug}-" . ($count + 1)
+                : $slug;
+            }
+
         });
 
-        static::updating(function ($mentor) {
-            $mentor->slug = Str::slug($mentor->name);
-        });
     }
+
 }
