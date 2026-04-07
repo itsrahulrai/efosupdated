@@ -40,6 +40,8 @@ use App\Http\Controllers\Mentor\SessionBookingController;
 use App\Http\Controllers\NewsEventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\Auth\GoogleController;
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -137,6 +139,12 @@ Route::get('/student/login', function (Illuminate\Http\Request $request)
     return view('student.login');
 
 })->name('student.login');
+
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+
+
 
 Route::get('/student/forgot-password', function ()
 {

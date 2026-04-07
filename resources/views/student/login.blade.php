@@ -132,6 +132,12 @@
                         </a>
                     </div>
 
+                    <div class="d-grid mt-3">
+                        <a href="{{ route('google.login') }}" class="btn btn-danger fw-semibold">
+                            <i class="bi bi-google"></i> Continue with Google
+                        </a>
+                    </div>
+
                 </form>
 
                 <!-- Footer -->
