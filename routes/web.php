@@ -40,11 +40,25 @@ use App\Http\Controllers\Mentor\SessionBookingController;
 use App\Http\Controllers\NewsEventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\MentorPaymentController;
 use App\Http\Controllers\Auth\GoogleController;
-
 use Illuminate\Support\Facades\Route;
 
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+
+Route::get('/clear-cache', function () {
+    Artisan::call('optimize:clear');
+    return "cache cleared";
+
+});
+
+
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+
 
 Route::get('news-events', [HomeController::class, 'newsEvents'])->name('news-events');
 
@@ -140,9 +154,6 @@ Route::get('/student/login', function (Illuminate\Http\Request $request)
 
 })->name('student.login');
 
-Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
-
-Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
 
 
@@ -404,6 +415,17 @@ Route::post('/jobs/{job}/apply', [JobApplicationController::class, 'apply'])->na
 PROTECTED STUDENT ROUTES
 ===================== */
 
+
+/* store previous url before login */
+
+Route::get('/set-intended-url', function ()
+{
+    session(['url.intended' => url()->previous()]);
+    return response()->json(true);
+
+});
+
+
 Route::middleware(['auth', 'role:student'])->group(function ()
 {
     Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
@@ -445,6 +467,20 @@ Route::middleware(['auth', 'role:student'])->group(function ()
     Route::post('/book-session', [MentorController::class, 'bookSession'])->name('book.session');
 
 });
+
+Route::get('/mentor/payment/initiate', [MentorPaymentController::class, 'initiatePayment'])
+    ->name('mentor.payment.initiate');
+
+
+Route::get('/mentor/payment/success', [MentorPaymentController::class, 'paymentSuccess'])
+    ->name('mentor.payment.success');
+
+Route::get('/mentor/payment/failure', [MentorPaymentController::class, 'paymentFailure'])
+    ->name('mentor.payment.failure');
+
+
+
+
 
 Route::get('{slug}', [PageController::class, 'show'])
     ->name('pages.show');

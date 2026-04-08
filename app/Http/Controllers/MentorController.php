@@ -6,11 +6,12 @@ use App\Models\MentorCategory;
 use App\Models\MentorProfile;
 use App\Models\MentorSessionPrice;
 use App\Models\SessionBooking;
-use App\Models\User;
 use App\Models\Student;
+use App\Models\User;
 use App\Traits\ImageUploadTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
@@ -151,12 +152,48 @@ class MentorController extends Controller
     //         }
     //     }
 
-    //     // dd($mentor->availabilities, $availabilitySlots);
+    //     // $selectedDate = Carbon::today();
+    //     $selectedDate = Carbon::parse('2026-04-10');
+
+    //     $bookings = SessionBooking::where('mentor_id', $mentor->id)
+    //         ->where('session_date', $selectedDate)
+    //         ->whereIn('status', ['pending', 'accepted', 'completed'])
+    //         ->get();
+
+    //     $bookedSlots = [];
+
+    //     foreach ($bookings as $booking)
+    //     {
+    //         $start = strtotime($booking->start_time);
+    //         $end = strtotime($booking->end_time);
+
+    //         while ($start < $end)
+    //         {
+    //             $dayName = strtolower(
+    //                 Carbon::parse($booking->session_date)->format('l')
+    //             );
+
+    //             $bookedSlots[$dayName][] =
+    //                 date('h:i A', $start);
+
+    //             $start = strtotime(
+    //                 "+{$mentor->availabilities->first()->slot_gap} minutes",
+    //                 $start
+    //             );
+    //         }
+    //     }
+
+    //     //   dd($mentor->availabilities, $availabilitySlots);
+    //     //   dd($bookedSlots);
 
     //     return view(
     //         'frontend.mentorship-details',
-    //         compact('mentor', 'availabilitySlots')
-    //     );
+    //         compact(
+    //             'mentor',
+    //             'availabilitySlots',
+    //             'bookedSlots'
+    //         ));
+
     // }
 
     public function mentorshipDetails($slug)
@@ -185,241 +222,365 @@ class MentorController extends Controller
             ->firstOrFail();
 
         /*
-        generate time slots
-        example:
-        10:00 → 10:10 → 10:20
+        Generate slots
          */
 
         $availabilitySlots = [];
 
         foreach ($mentor->sessionPrices as $price)
         {
-
             $duration = $price->duration_minutes;
 
             foreach ($mentor->availabilities as $availability)
             {
+                $slotGap = $availability->slot_gap; // dynamic gap
 
                 $startTime = strtotime($availability->start_time);
                 $endTime = strtotime($availability->end_time);
 
                 while ($startTime + ($duration * 60) <= $endTime)
                 {
+                    $availabilitySlots[$duration][$availability->day][] =
+                        date('h:i A', $startTime);
 
-                    $availabilitySlots
-                    [$duration]
-                    [$availability->day][]
-                    = date('h:i A', $startTime);
-
-                    $startTime = strtotime(
-                        "+{$availability->slot_gap} minutes",
-                        $startTime
-                    );
+                    $startTime = strtotime("+{$slotGap} minutes", $startTime);
                 }
-
             }
         }
 
-        // $selectedDate = Carbon::today();
-        $selectedDate = Carbon::parse('2026-04-10');
+        /*
+        get booked sessions (future)
+         */
 
-        $bookings = SessionBooking::where('mentor_id', $mentor->id)
-            ->where('session_date', $selectedDate)
-            ->whereIn('status', ['pending', 'accepted', 'completed'])
+        $bookings =
+        SessionBooking::where(
+            'mentor_id',
+            $mentor->id
+        )
+
+            ->whereDate(
+                'session_date',
+                '>=',
+                now()
+            )
+
+            ->where(function ($q)
+        {
+
+                $q->where(
+                    'payment_status',
+                    'success'
+                )
+
+                    ->orWhereIn(
+                        'status',
+                        [
+                            'accepted',
+                            'completed',
+                        ]
+                    );
+
+            })
+
             ->get();
+
+        /*
+        convert bookings to slot format
+         */
 
         $bookedSlots = [];
 
         foreach ($bookings as $booking)
         {
-            $start = strtotime($booking->start_time);
-            $end = strtotime($booking->end_time);
+
+            $start =
+                strtotime(
+                $booking->start_time
+            );
+
+            $end =
+                strtotime(
+                $booking->end_time
+            );
+
+            $dayName =
+                strtolower(
+
+                Carbon::parse(
+                    $booking->session_date
+                )->format('l')
+
+            );
 
             while ($start < $end)
             {
-                $dayName = strtolower(
-                    Carbon::parse($booking->session_date)->format('l')
+
+                $bookedSlots
+                [$dayName][]
+
+                =
+                    date(
+                    'h:i A',
+                    $start
                 );
 
-                $bookedSlots[$dayName][] =
-                    date('h:i A', $start);
-
-                $start = strtotime(
+                $start =
+                    strtotime(
                     "+{$mentor->availabilities->first()->slot_gap} minutes",
                     $start
                 );
+
             }
+
         }
-
-        //   dd($mentor->availabilities, $availabilitySlots);
-
-        //   dd($bookedSlots);
 
         return view(
             'frontend.mentorship-details',
-            compact(
-                'mentor',
-                'availabilitySlots',
-                'bookedSlots'
-            ));
+            compact('mentor', 'availabilitySlots', 'bookedSlots')
+
+        );
 
     }
 
     public function bookSession(Request $request)
     {
-        $request->validate([
-            'mentor_id' => 'required',
-            'duration' => 'required',
-            'day' => 'required',
-            'time' => 'required',
-        ]);
+        try {
 
-        if (!auth()->check())
-        {
+            DB::beginTransaction();
 
-            return response()->json([
-                'status' => false,
-                'message' => 'Please login first',
+            $request->validate([
+
+                'mentor_id' => 'required',
+
+                'duration' => 'required',
+
+                'day' => 'required',
+
+                'time' => 'required',
+
             ]);
 
-        }
+            /*
+            get session price
+             */
 
-/* get mentor price record */
+            $sessionPrice =
+            MentorSessionPrice::where([
 
-        $sessionPrice =
-        MentorSessionPrice::where([
-            'mentor_id' => $request->mentor_id,
-            'duration_minutes' => $request->duration,
-        ])->first();
+                'mentor_id' => $request->mentor_id,
 
-        if (!$sessionPrice)
-        {
+                'duration_minutes' => $request->duration,
 
-            return response()->json([
-                'status' => false,
-                'message' => 'Price not found',
-            ]);
+            ])->first();
 
-        }
+            if (!$sessionPrice)
+            {
 
-/*
-convert time
- */
+                return response()->json([
 
-        $startTime =
-        Carbon::createFromFormat(
-            'h:i A',
-            $request->time
-        );
+                    'status' => false,
 
-        $endTime =
-        (clone $startTime)
-            ->addMinutes(
-                $request->duration
+                    'message' => 'Session price not found',
+
+                ]);
+
+            }
+
+            /*
+            convert time
+             */
+
+            $startTime =
+            Carbon::createFromFormat(
+
+                'h:i A',
+
+                $request->time
+
             );
 
-/*
-get next date of selected day
- */
+            $endTime =
+            (clone $startTime)
+                ->addMinutes(
+                    $request->duration
+                );
 
-        $sessionDate =
-        Carbon::now()
-            ->next(
-                ucfirst($request->day)
-            );
+            /*
+            get session date
+             */
 
-/*
-prevent duplicate booking
- */
+            $sessionDate =
+            Carbon::now()
+                ->next(
+                    ucfirst($request->day)
+                );
 
-        $alreadyBooked =
-        SessionBooking::where([
-            'mentor_id' => $request->mentor_id,
+            /*
+            prevent overlapping booking
+             */
 
-            'session_date' => $sessionDate->format('Y-m-d'),
+            $alreadyBooked = SessionBooking::where('mentor_id', $request->mentor_id)
+                ->where('session_date', $sessionDate->format('Y-m-d'))
 
-            'start_time' => $startTime->format('H:i:s'),
+                ->where(function ($q) use ($startTime, $endTime)
+            {
 
-        ])->exists();
+                    $q->where('start_time', '<', $endTime->format('H:i:s'))
+                        ->where('end_time', '>', $startTime->format('H:i:s'));
 
-        if ($alreadyBooked)
-        {
+                })
+
+                ->where(function ($q)
+            {
+
+                    $q->where('payment_status', 'success')
+                        ->orWhere('status', 'accepted');
+
+                })
+
+                ->exists();
+
+            if ($alreadyBooked)
+            {
+
+                return response()->json([
+
+                    'status' => false,
+
+                    'message' => 'This time slot is already booked',
+
+                ]);
+
+            }
+
+            /*
+            student
+             */
+
+            $student =
+            Student::where(
+
+                'user_id',
+
+                auth()->id()
+
+            )->first();
+
+            if (!$student)
+            {
+
+                return response()->json([
+
+                    'status' => false,
+
+                    'message' => 'Student profile not found',
+
+                ]);
+
+            }
+
+            /*
+            calculate price
+             */
+
+            $price =
+            $sessionPrice->discount_price ??
+            $sessionPrice->price ??
+                0;
+
+            /*
+            save booking
+             */
+
+            $booking =
+            SessionBooking::create([
+
+                'mentor_id' => $request->mentor_id,
+
+                'student_id' => $student->id,
+
+                'session_price_id' => $sessionPrice->id,
+
+                'session_date' => $sessionDate->format('Y-m-d'),
+
+                'start_time' => $startTime->format('H:i:s'),
+
+                'end_time' => $endTime->format('H:i:s'),
+
+                'duration_minutes' => $request->duration,
+
+                'price' => $sessionPrice->price,
+
+                'discount_price' => $sessionPrice->discount_price,
+
+                'final_price' => $price,
+
+                'payment_status' => 'pending',
+
+                'meeting_platform' => 'zoom',
+
+                'status' => 'pending',
+
+            ]);
+
+            DB::commit();
 
             return response()->json([
-                'status' => false,
-                'message' => 'Slot already booked',
+
+                'status' => true,
+
+                'booking_id' => $booking->id,
+
+                'message' => 'Redirecting to payment',
+
             ]);
 
         }
+        catch (\Illuminate\Database\QueryException $e)
+        {
 
-/*
-calculate price
- */
+            DB::rollBack();
 
-        $price =
-        $sessionPrice->discount_price ?? $sessionPrice->price ?? 0;
+            /*
+            handle duplicate DB unique error
+             */
 
-/*
-save booking
- */
-$student =
-Student::where(
-    'user_id',
-    auth()->id()
-)->first();
+            if ($e->errorInfo[1] == 1062)
+            {
 
-if (!$student)
-{
+                return response()->json([
 
-    return response()->json([
-        'status' => false,
-        'message' => 'Student profile not found',
-    ]);
+                    'status' => false,
 
-}
+                    'message' => 'This slot is already booked. Please select another time.',
 
+                ]);
 
-        SessionBooking::create([
+            }
 
-            'mentor_id' => $request->mentor_id,
+            return response()->json([
 
-            'student_id' =>  $student->id,
+                'status' => false,
 
-            'session_price_id' => $sessionPrice->id,
+                'message' => 'Database error occurred',
 
-            'session_date' => $sessionDate->format('Y-m-d'),
+            ]);
 
-            'start_time' => $startTime->format('H:i:s'),
+        }
+        catch (\Exception $e)
+        {
 
-            'end_time' => $endTime->format('H:i:s'),
+            DB::rollBack();
 
-            'duration_minutes' => $request->duration,
+            return response()->json([
 
-            'price' => $sessionPrice->price,
+                'status' => false,
 
-            'discount_price' => $sessionPrice->discount_price,
+                'message' => 'Something went wrong. Please try again.',
 
-            'final_price' => $price,
+            ]);
 
-            'payment_status' => 'pending',
-
-            'payment_gateway' => null,
-
-            'transaction_id' => null,
-
-            'meeting_platform' => $sessionPrice->meeting_platform ?? 'zoom',
-
-            'status' => 'pending',
-
-        ]);
-
-        return response()->json([
-
-            'status' => true,
-
-            'message' => 'Session booked successfully',
-
-        ]);
+        }
 
     }
 }

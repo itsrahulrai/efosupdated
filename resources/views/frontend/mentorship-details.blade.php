@@ -891,6 +891,59 @@
             border-color: #E72434;
             color: #fff;
         }
+
+        /* payment  */
+        .payment-summary {
+
+            background: #fff;
+
+            border: 1px solid #eee;
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            margin-bottom: 15px;
+
+            width: 100%;
+
+        }
+
+        .summary-title {
+
+            font-weight: 700;
+
+            margin-bottom: 10px;
+
+            font-size: 15px;
+
+        }
+
+        .summary-row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            font-size: 14px;
+
+            margin-bottom: 6px;
+
+        }
+
+        .summary-row.total {
+
+            border-top: 1px solid #eee;
+
+            padding-top: 8px;
+
+            font-weight: 700;
+
+            font-size: 15px;
+
+            color: #E72434;
+
+        }
     </style>
 @endpush
 
@@ -929,7 +982,7 @@
                         <!-- Meta Info -->
                         <div class="mentor-meta">
                             <div class="meta-item">
-                                <span><strong>London</strong>, {{ $mentor->city }}, {{ $mentor->state }}</span>
+                                <span><strong></strong>{{ $mentor->city }}, {{ $mentor->state }}</span>
                             </div>
                             <div class="meta-item">
                                 <span><strong>Verified</strong> Mentor</span>
@@ -937,9 +990,22 @@
                         </div>
 
                         <!-- Price -->
+                        @php
+                            $firstDuration = array_key_first($availabilitySlots);
+
+                            $defaultPrice = optional(
+                                $mentor->sessionPrices->where('duration_minutes', $firstDuration)->first(),
+                            )->discount_price;
+                        @endphp
+
                         <div class="price-section">
-                            <div class="price">₹56</div>
-                            <div class="price-subtext">40 min session</div>
+                            <div class="price" id="mainPrice">
+                                ₹ {{ rtrim(rtrim(number_format($defaultPrice, 2), '0'), '.') }}
+                            </div>
+
+                            <div class="price-subtext" id="mainDuration">
+                                {{ $firstDuration }} min session
+                            </div>
                         </div>
 
                         <!-- Buttons -->
@@ -1057,9 +1123,38 @@
 
                             <!-- Selected Time Display & Book Button -->
                             <div class="booking-section">
+
                                 <div class="selected-time-info">
                                     <span class="info-label">Selected Time:</span>
                                     <span class="info-value" id="selectedTimeDisplay">No time selected</span>
+                                </div>
+
+                                <div class="payment-summary">
+
+                                    <div class="summary-title">
+                                        Payment Details
+                                    </div>
+
+                                    <div class="summary-row">
+                                        <span>Session</span>
+                                        <span id="summaryDuration">--</span>
+                                    </div>
+
+                                    <div class="summary-row">
+                                        <span>Date</span>
+                                        <span id="summaryDay">--</span>
+                                    </div>
+
+                                    <div class="summary-row">
+                                        <span>Time</span>
+                                        <span id="summaryTime">--</span>
+                                    </div>
+
+                                    <div class="summary-row total">
+                                        <span>Total</span>
+                                        <span id="summaryPrice">₹0</span>
+                                    </div>
+
                                 </div>
                                 <input type="hidden" id="mentor_id" value="{{ $mentor->id }}">
                                 <input type="hidden" id="session_price_id">
@@ -1107,6 +1202,18 @@
             const bookBtn =
                 document.getElementById("bookBtn");
 
+            const summaryDuration =
+                document.getElementById("summaryDuration");
+
+            const summaryDay =
+                document.getElementById("summaryDay");
+
+            const summaryTime =
+                document.getElementById("summaryTime");
+
+            const summaryPrice =
+                document.getElementById("summaryPrice");
+
 
             /* duration change */
 
@@ -1121,6 +1228,15 @@
                     this.classList.add("active");
 
                     activeDuration = this.dataset.duration;
+
+                    let priceElement =
+                        this.querySelector(".price-text");
+
+                    summaryPrice.innerText =
+                        priceElement.innerText;
+
+                    summaryDuration.innerText =
+                        activeDuration + " minutes";
 
                     selectedSlot = null;
 
@@ -1187,6 +1303,23 @@
                             selectedSlot +
                             " (" + activeDuration + " min)";
 
+                        summaryTime.innerText =
+                            selectedSlot;
+
+                        summaryDay.innerText =
+                            document.querySelector(".day-btn.active").innerText;
+
+                        summaryDuration.innerText =
+                            activeDuration + " minutes";
+
+                        let priceElement =
+                            document.querySelector(
+                                '.duration-btn.active .price-text'
+                            );
+
+                        summaryPrice.innerText =
+                            priceElement.innerText;
+
                         bookBtn.disabled = false;
 
                     }
@@ -1212,72 +1345,80 @@
 
             }
 
-                /* AJAX booking */
+            /* AJAX booking */
 
             bookBtn.addEventListener("click", function() {
 
-                fetch(
-                        "{{ route('book.session') }}", {
-                            method: "POST",
+                fetch("{{ route('book.session') }}", {
 
-                            headers: {
-                                "Content-Type": "application/json",
+                        method: "POST",
 
-                                "X-CSRF-TOKEN": document
-                                    .querySelector('meta[name="csrf-token"]')
-                                    .getAttribute("content")
-                            },
+                        credentials: "same-origin",
 
-                            body: JSON.stringify({
+                        headers: {
 
-                                mentor_id: document
-                                    .getElementById("mentor_id").value,
+                            "Content-Type": "application/json",
 
-                                duration: activeDuration,
+                            "Accept": "application/json",
 
-                                day: document
-                                    .querySelector(".day-btn.active")
-                                    .innerText
-                                    .toLowerCase(),
+                            "X-CSRF-TOKEN": document
+                                .querySelector('meta[name="csrf-token"]')
+                                .getAttribute("content")
 
-                                time: selectedSlot
+                        },
 
-                            })
+                        body: JSON.stringify({
+
+                            mentor_id: document.getElementById("mentor_id").value,
+
+                            duration: activeDuration,
+
+                            day: document
+                                .querySelector(".day-btn.active")
+                                .innerText
+                                .toLowerCase(),
+
+                            time: selectedSlot
 
                         })
 
-                    .then(response => response.json())
+                    })
 
-                    .then(data => {
+                    .then(async response => {
+                        if (response.status === 401) {
+                            fetch("/set-intended-url");
+                            window.location.href = "{{ route('student.login') }}";
+                            return;
+                        }
 
+                        let data = await response.json();
                         if (data.status) {
 
-                            toastr.success(
-                                data.message
-                            );
+                            toastr.success("Redirecting to payment...");
 
-                            setTimeout(() => {
+                            /* disable selected slot immediately */
 
-                                location.reload();
+                            document
+                                .querySelectorAll(".slot.active")
+                                .forEach(slot => {
+                                    slot.classList.remove("active");
+                                    slot.classList.add("booked");
 
-                            }, 1500);
+                                });
+
+                            /* redirect to payment */
+
+                            window.location.href =
+                                "{{ route('mentor.payment.initiate') }}?booking_id=" + data.booking_id;
 
                         } else {
-
-                            toastr.error(
-                                data.message
-                            );
-
+                            toastr.error(data.message);
                         }
 
                     })
 
                     .catch(error => {
-
-                        toastr.error(
-                            "Something went wrong"
-                        );
-
+                        toastr.error("Something went wrong");
                     });
 
             });

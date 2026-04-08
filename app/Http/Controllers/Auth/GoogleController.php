@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Student;
 use App\Models\User;
+use App\Models\Student;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -20,65 +21,86 @@ class GoogleController extends Controller
 
     public function handleGoogleCallback()
     {
+
         try {
 
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            Log::info('Google callback started');
+
+            $googleUser = Socialite::driver('google')->user();
+
+            Log::info('Google user data', [
+                'email' => $googleUser->getEmail(),
+                'name' => $googleUser->getName(),
+                'google_id' => $googleUser->getId(),
+            ]);
 
             DB::beginTransaction();
 
-            // check if user already exists
-            $user = User::where('email', $googleUser->getEmail())->first();
+           $user = User::where('google_id', $googleUser->getId())
+            ->orWhere('email', $googleUser->getEmail())
+            ->first();
 
-            if (!$user)
-            {
+            if (!$user) {
+
+                Log::info('Creating new user');
 
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
                     'password' => bcrypt(Str::random(16)),
-                    'role' => 'student',
+                    'role' => 'student'
                 ]);
 
-                // generate registration number
-                $lastStudent = Student::orderBy('id', 'desc')->first();
+                Log::info('User created', ['user_id' => $user->id]);
 
-                $nextNumber = 1;
+                $lastStudent = Student::latest()->first();
 
-                if ($lastStudent && $lastStudent->registration_number)
-                {
-                    $lastNumber = (int) str_replace('EFOS', '', $lastStudent->registration_number);
-                    $nextNumber = $lastNumber + 1;
-                }
+                $nextNumber = $lastStudent
+                    ? (int) str_replace('EFOS', '', $lastStudent->registration_number) + 1
+                    : 1;
 
                 $registrationNumber = 'EFOS' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
-                // create student record
                 Student::create([
                     'user_id' => $user->id,
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
+                    'phone'=>null,
                     'registration_number' => $registrationNumber,
-                    'profile_completed' => 0,
+                    'profile_completed'=>'pending'
                 ]);
 
+                Log::info('Student created', [
+                    'registration_number' => $registrationNumber
+                ]);
             }
 
             Auth::login($user);
 
+            request()->session()->regenerate();
+
+            Log::info('User logged in', [
+                'auth_check' => Auth::check(),
+                'role' => $user->role
+            ]);
+
             DB::commit();
 
-            return redirect('/student/dashboard');
+            Log::info('Redirecting to dashboard');
+
+            return redirect()->route('student.dashboard');
 
         }
-        catch (\Exception $e)
-        {
+        catch (\Exception $e) {
 
             DB::rollBack();
 
-            return redirect('/login')->with('error', $e->getMessage());
+            Log::error('Google login error', [
+                'message' => $e->getMessage()
+            ]);
 
+            return redirect('/login')->with('error', $e->getMessage());
         }
     }
-
 }

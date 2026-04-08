@@ -9,327 +9,211 @@
 @section('meta_robots', 'index, follow')
 @section('canonical', url('mentorship'))
 
-@push('style')
+@push('style') 
     <style>
         :root {
-            --primary-color: #E72939;
-            --dark-color: #181818;
-            --gray-light: #f5f5f5;
-            --gray-medium: #999;
-            --white: #ffffff;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    --primary-color: #E72939;
+    --dark-color: #181818;
+    --gray-light: #f5f5f5;
+    --gray-medium: #999;
+    --white: #ffffff;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-        .mentors-section {
-            padding: 60px 0;
-            background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
-        }
+/* section */
+.mentors-section {
+    padding: 60px 0;
+    background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+}
 
-        .section-header {
-            text-align: center;
-            margin-bottom: 50px;
-            animation: fadeInUp 0.8s ease-out;
-        }
+/* header */
+.section-header {
+    text-align: center;
+    margin-bottom: 50px;
+    animation: fadeInUp 0.8s ease-out;
+}
 
-        .section-header h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--dark-color);
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
-        }
+.section-header h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
 
-        .section-header p {
-            font-size: 1.1rem;
-            color: var(--gray-medium);
-            font-weight: 400;
-        }
+.section-header p {
+    font-size: 1.1rem;
+    color: var(--gray-medium);
+}
 
-        .mentors-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            animation: fadeIn 0.8s ease-out 0.2s both;
-        }
+/* GRID FIX */
+.mentors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 380px));
+    justify-content: start;
+    gap: 30px;
+}
 
-        .mentor-card {
-            background: var(--white);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            transition: var(--transition);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
+/* card */
+.mentor-card {
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.07);
+    transition: var(--transition);
+    border: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 380px;
+    width: 100%;
+}
 
-        .mentor-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(231, 41, 57, 0.15);
-            border-color: rgba(231, 41, 57, 0.1);
-        }
+.mentor-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 45px rgba(231,41,57,0.15);
+}
 
-        /* image wrapper */
+/* image */
+.mentor-card__image-wrapper {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+    background: #eee;
+}
 
-        .mentor-card__image-wrapper {
-            position: relative;
-            height: 260px;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #f5f5f5;
-        }
-        /* mentor image */
-        .mentor-card__image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: 0.4s;
-        }
-        
-        /* vertical experience strip */
-        .mentor-card__experience {
-            position: absolute;
-            left: 0;
-            top: 20px;
-            bottom: 20px;
-            width: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(180deg,
-                    #E72939,
-                    #181818);
+.mentor-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: .4s;
+}
 
-            color: #fff;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
-            border-radius: 0 8px 8px 0;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
+.mentor-card:hover .mentor-card__image {
+    transform: scale(1.05);
+}
 
-        /* hover zoom */
-        .mentor-card:hover .mentor-card__image {
-            transform: scale(1.05);
-        }
-        .mentor-card:hover .mentor-card__image {
-            transform: scale(1.05);
-        }
-        .mentor-card__badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: var(--primary-color);
-            color: var(--white);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(231, 41, 57, 0.3);
-        }
-        .mentor-card__content {
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-        .mentor-card__meta {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            margin-bottom: 12px;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        .rating {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+/* experience strip */
+.mentor-card__experience {
+    position: absolute;
+    left: 0;
+    top: 20px;
+    bottom: 20px;
+    width: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg,#E72939,#181818);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    border-radius: 0 8px 8px 0;
+}
 
-        .stars {
-            color: var(--primary-color);
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-        }
+/* content */
+.mentor-card__content {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
 
-        .rating-count {
-            font-size: 0.85rem;
-            color: var(--gray-medium);
-        }
+/* name */
+.mentor-card__name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #181818;
+    margin-bottom: 6px;
+}
 
-        .experience {
-            font-size: 0.85rem;
-            color: var(--dark-color);
-            font-weight: 600;
-        }
-        .mentor-card__bio {
-            font-size: 0.95rem;
-            color: #666;
-            line-height: 1.6;
-            margin: 12px 0;
-            flex-grow: 1;
-        }
-        .tag {
-            display: inline-block;
-            background: rgba(231, 41, 57, 0.08);
-            color: var(--primary-color);
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-        .tag:hover {
-            background: rgba(231, 41, 57, 0.15);
-        }
-        .mentor-card__btn {
-            width: 100%;
-            padding: 12px 24px;
-            background: var(--primary-color);
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: auto;
-        }
-        .mentor-card__btn:hover {
-            background: var(--dark-color);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(24, 24, 24, 0.3);
-        }
+.mentor-card__name a {
+    color: #181818;
+    text-decoration: none;
+}
 
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);}
+/* category */
+.mentor-card__role {
+    font-size: 13px;
+    margin-bottom: 10px;
+}
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.mentor-card__title {
+    color: #E72939;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
+/* bio */
+.mentor-card__bio {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    flex-grow: 1;
+}
 
-            to {
-                opacity: 1;
-            }
-        }
+/* button */
+.mentor-card__btn {
+    width: 100%;
+    padding: 12px;
+    background: #E72939;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s;
+}
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .section-header h2 {
-                font-size: 2rem;
-            }
+.mentor-card__btn:hover {
+    background: #181818;
+}
 
-            .mentors-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
+/* animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-            .mentor-card__image-wrapper {
-                height: 240px;
-            }
+/* tablet */
+@media(max-width:991px) {
 
-            .mentor-card__name {
-                font-size: 1.2rem;
-            }
+    .mentors-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 340px));
+    }
 
-            .mentor-card__content {
-                padding: 20px;
-            }
-        }
+}
 
-        @media (max-width: 480px) {
-            .mentors-section {
-                padding: 40px 0;
-            }
+/* mobile */
+@media(max-width:576px) {
 
-            .section-header h2 {
-                font-size: 1.7rem;
-            }
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
 
-            .section-header p {
-                font-size: 1rem;
-            }
+    .mentors-grid {
+        grid-template-columns: 1fr;
+    }
 
-            .mentor-card__image-wrapper {
-                height: 200px;
-            }
+    .mentor-card {
+        max-width: 100%;
+    }
 
-            .mentor-card__meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
+    .mentor-card__image-wrapper {
+        height: 220px;
+    }
 
-            .mentor-card__btn {
-                padding: 10px 20px;
-                font-size: 0.9rem;
-            }
-        }
-
-        /* header */
-        .mentor-card__header {
-            margin-bottom: 12px;
-        }
-
-        /* mentor name */
-
-        .mentor-card__name{
-        font-family:'Poppins', sans-serif;
-        font-size:22px;
-        font-weight:700;
-        color:#181818;
-        margin-bottom:6px;
-        letter-spacing:-0.2px;
-        line-height:1.35;
-        transition:.3s;
-        }
-        /* role row */
-        .mentor-card__role {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
-            font-size: 13px;
-        }
-
-        /* title */
-        .mentor-card__title {
-            color: #E72939;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .6px;
-        }
-
-        /* company */
-        .mentor-card__company {
-            color: #777;
-            font-weight: 500;
-        }
-
-        /* divider dot */
-        .mentor-divider {
-            color: #ccc;
-            font-size: 12px;
-        }
+}
     </style>
 @endpush
 @section('content')

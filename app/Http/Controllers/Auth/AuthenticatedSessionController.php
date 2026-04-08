@@ -26,40 +26,58 @@ class AuthenticatedSessionController extends Controller
 
     // public function store(LoginRequest $request): RedirectResponse
     // {
+    //     // dd($request->all());
+
     //     $request->authenticate();
     //     $request->session()->regenerate();
 
     //     $user = Auth::user();
 
     //     // ---------- ADMIN ----------
-    //     if ($user->role === 'admin') {
+    //     if ($user->role === 'admin')
+    //     {
     //         return redirect('/admin/dashboard');
     //     }
 
     //     // ---------- FRANCHISE ----------
-    //     if ($user->role === 'franchise') {
-    //         if (!$user->franchiseProfile || $user->franchiseProfile->status !== 'approved') {
+    //     if ($user->role === 'franchise')
+    //     {
+    //         if (!$user->franchiseProfile || $user->franchiseProfile->status !== 'approved')
+    //         {
     //             Auth::logout();
     //             return redirect('/login')->withErrors([
-    //                 'error' => 'Your franchise account is under review.'
+    //                 'error' => 'Your franchise account is under review.',
     //             ]);
     //         }
     //         return redirect('/franchise/dashboard');
     //     }
 
     //     // ---------- STUDENT ----------
-    //     if ($user->role === 'student') {
-
-    //         // ✅ THIS IS THE MAGIC LINE
-    //         // return redirect()->intended(route('student.dashboard'));
+    //     if ($user->role === 'student')
+    //     {
     //         return redirect()->route('student.dashboard');
     //     }
 
+    //     // ---------- MENTOR ----------
+    //     if ($user->role === 'mentor')
+    //     {
+    //         if (!$user->mentorProfile || $user->mentorProfile->status !== 'approved')
+    //         {
+    //             Auth::logout();
+    //             return redirect('/login')->withErrors([
+    //                 'error' => 'Your mentor account is under review.',
+    //             ]);
+    //         }
+    //         return redirect()->route('mentor.dashboard');
+    //     }
+
     //     Auth::logout();
-    //     return redirect('/login')->withErrors(['error' => 'Invalid role']);
+    //     return redirect('/login')->withErrors([
+    //         'error' => 'Invalid role',
+    //     ]);
     // }
 
-    public function store(LoginRequest $request): RedirectResponse
+      public function store(LoginRequest $request): RedirectResponse
     {
         // dd($request->all());
 
@@ -90,8 +108,9 @@ class AuthenticatedSessionController extends Controller
         // ---------- STUDENT ----------
         if ($user->role === 'student')
         {
-            return redirect()->route('student.dashboard');
+            return redirect()->intended(route('student.dashboard'));
         }
+
 
         // ---------- MENTOR ----------
         if ($user->role === 'mentor')

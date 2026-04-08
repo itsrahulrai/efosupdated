@@ -10,24 +10,39 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, $role)
     {
+
         // not logged in
         if (!Auth::check()) {
             return redirect()->route('login')
                 ->with('error', 'Please login first.');
         }
 
-        // wrong role (example admin trying student route)
+        // wrong role
         if (Auth::user()->role !== $role) {
 
-            // if admin logged in, redirect admin dashboard
+            // admin logged in but trying student page
             if (Auth::user()->role == 'admin') {
 
                 return redirect()->route('admin.dashboard')
-                    ->with('error', 'Please login as Student to enroll free course.');
+                    ->with('error', 'Access denied for this section.');
             }
 
-            // default redirect back
-            return redirect()->back()
+            // mentor logged in
+            if (Auth::user()->role == 'mentor') {
+
+                return redirect()->route('mentor.dashboard')
+                    ->with('error', 'Access denied for this section.');
+            }
+
+            // franchise logged in
+            if (Auth::user()->role == 'franchise') {
+
+                return redirect()->route('franchise.dashboard')
+                    ->with('error', 'Access denied for this section.');
+            }
+
+            // default
+            return redirect('/')
                 ->with('error', 'Unauthorized access.');
         }
 

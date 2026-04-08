@@ -182,6 +182,10 @@
                                                 <textarea name="content" id="content" class="form-control" rows="6">
                                                     {{ old('content', $lesson->content ?? '') }}
                                                                     </textarea>
+                                                                     <!-- Note -->
+                                                <small class="text-muted">
+                                                    Recommended image size: <b>650 × 433 px (Width × Height)</b> for proper alignment and clear display in content editor.
+                                                </small>
                                             </div>
                                             <div class="col-md-8 mb-3">
                                                 <label class="form-label">Upload PDF</label>
