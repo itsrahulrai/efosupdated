@@ -1,0 +1,43 @@
+BASE URL
+http://localhost/laravel/efosupdated/api
+
+
+STUDENT API
+POST  http://localhost/laravel/efosupdated/api/student-register
+
+
+BLOG API
+GET   http://localhost/laravel/efosupdated/api/blogs
+GET   http://localhost/laravel/efosupdated/api/blog-details/why-global-finance-careers-like-acca-will-dominate-the-future-of-employment
+
+
+COURSE (LMS) API
+GET   http://localhost/laravel/efosupdated/api/courses
+GET   http://localhost/laravel/efosupdated/api/course-details/retail-management-course
+GET   http://localhost/laravel/efosupdated/api/lesson-details/introduction-to-ai-and-prompt-engineering-video-lecture
+GET   http://localhost/laravel/efosupdated/api/quiz/2
+GET   http://localhost/laravel/efosupdated/api/bundles
+
+
+JOB API
+GET   http://localhost/laravel/efosupdated/api/jobs
+GET   http://localhost/laravel/efosupdated/api/job-details/btech-electrical-engineering-lateral-entry
+GET   http://localhost/laravel/efosupdated/api/similar-jobs/mca-degree-online
+POST  http://localhost/laravel/efosupdated/api/apply-job
+
+
+JOB FILTER API
+GET   http://localhost/laravel/efosupdated/api/jobs-filter
+GET   http://localhost/laravel/efosupdated/api/jobs-filter?job_category_id=2
+GET   http://localhost/laravel/efosupdated/api/jobs-filter?search=Picker%20Packer%20Job%20in%20North%20India
+GET   http://localhost/laravel/efosupdated/api/jobs-filter?job_category_id=6&job_sub_category_id=20
+
+
+JOB CATEGORY API
+GET   http://localhost/laravel/efosupdated/api/job-categories
+GET   http://localhost/laravel/efosupdated/api/job-subcategories/3
+
+
+CMS API
+GET   http://localhost/laravel/efosupdated/api/news-events
+GET   http://localhost/laravel/efosupdated/api/youtube-videos

@@ -7,21 +7,33 @@ use App\Models\Blog;
 use App\Models\Category;
 use App\Models\CourseBundle;
 use App\Models\CourseLesson;
+use App\Models\FranchiseProfile;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobCategory;
 use App\Models\JobSubCategory;
 use App\Models\LearningCourse;
 use App\Models\LessonProgress;
+use App\Models\MentorProfile;
 use App\Models\NewsEvent;
+use App\Models\Page;
 use App\Models\Quiz;
+use App\Models\User;
+use App\Models\Student;
+
 use App\Models\YoutubeVideo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\SessionBooking;
+use App\Models\MentorSessionPrice;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+
 
 class HomeApiController extends Controller
 {
-    
+
     /**
      * Get all blogs list
      */
@@ -109,7 +121,7 @@ class HomeApiController extends Controller
         ]);
     }
 
-     /**
+    /**
      * Get course details OR bundle details using slug
      */
 
@@ -229,7 +241,7 @@ class HomeApiController extends Controller
         ]);
     }
 
-        /**
+    /**
      * Get quiz details with questions & options
      */
 
@@ -254,7 +266,7 @@ class HomeApiController extends Controller
         ]);
     }
 
-     /**
+    /**
      * Get all course bundles
      */
 
@@ -271,7 +283,7 @@ class HomeApiController extends Controller
         ]);
     }
 
-     /**
+    /**
      * Get all jobs list
      */
     public function jobs()
@@ -288,7 +300,7 @@ class HomeApiController extends Controller
 
     /**
      * Get similar jobs using slug
-    */
+     */
     public function similarJobs($slug)
     {
         $job = Job::where('slug', $slug)
@@ -508,4 +520,361 @@ class HomeApiController extends Controller
             'data' => $youtubeVideos,
         ]);
     }
+
+    /**
+     * Find partner center
+     */
+    public function findCenter(Request $request)
+    {
+        $centers = FranchiseProfile::with('user')
+            ->when($request->state, function ($q) use ($request)
+        {
+                $q->where('state', $request->state);
+
+            })->when($request->district, function ($q) use ($request)
+        {
+            $q->where('district', $request->district);
+
+        })->where('status', 'approved')->get();
+
+        return response()->json(['success' => true, 'data' => $centers,
+        ]);
+    }
+
+    /**
+     * Apply Franchise API
+     * Creates user + franchise profile
+     */
+
+    public function applyFranchise(Request $request)
+    {
+        $request->validate([
+            'owner_name' => 'required|string',
+            'company_name' => 'required|string',
+            'phone' => 'required|unique:users,phone|unique:franchise_profiles,phone',
+            'email' => 'required|email|unique:users,email|unique:franchise_profiles,email',
+            'state' => 'required',
+            'district' => 'required',
+            'business_experience' => 'required',
+        ]);
+        // create login account
+        $password = $request->phone;
+        $user = User::create([
+            'name' => $request->owner_name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => bcrypt($password),
+            'role' => 'franchise',
+        ]);
+
+        // create franchise profile
+        $profile = FranchiseProfile::create([
+            'user_id' => $user->id,
+            'owner_name' => $request->owner_name,
+            'company_name' => $request->company_name,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'state' => $request->state,
+            'district' => $request->district,
+            'business_experience' => $request->business_experience,
+            'message' => $request->message,
+            'status' => 'pending',
+
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Franchise application submitted successfully',
+            'login_credentials' => [
+                'email' => $request->email,
+                'password' => $password,
+            ],
+            'data' => $profile,
+        ]);
+    }
+
+    /**
+     * Mentor listing page
+     */
+    public function mentorship()
+    {
+        $mentors = MentorProfile::with('category')
+            ->where('status', 'approved')
+            ->latest()
+            ->get();
+        return response()->json([
+            'success' => true,
+            'data' => $mentors,
+        ]);
+    }
+
+    /**
+     * Mentor details page
+     */
+    public function mentorshipDetails($slug)
+    {
+        $mentor = MentorProfile::with([
+            'category',
+            'sessionPrices',
+            'availabilities',
+        ])->where('slug', $slug)
+            ->where('status', 'approved')
+            ->first();
+
+        if (!$mentor)
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mentor not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $mentor,
+        ]);
+    }
+
+    /**
+     * Jobs listing by category slug
+     */
+    public function opportunityHighlights($slug = null)
+    {
+        $jobs = Job::with('category')
+
+            ->when($slug, function ($q) use ($slug)
+        {
+
+                $q->whereHas('category', function ($qq) use ($slug)
+            {
+
+                    $qq->where('slug', $slug);
+
+                });
+
+            })
+
+            ->where('status', 1)
+
+            ->latest()
+
+            ->get();
+
+        return response()->json([
+
+            'success' => true,
+
+            'data' => $jobs,
+
+        ]);
+    }
+
+    public function pageDetails($slug)
+    {
+        $page = Page::where('slug', $slug)
+            ->where('status', 1)->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => $page,
+        ]);
+    }
+
+   
+
+
+/**
+ * Book mentor session API
+ */
+
+public function bookSession(Request $request)
+{
+    try {
+
+        DB::beginTransaction();
+
+        $request->validate([
+
+            'mentor_id' => 'required',
+
+            'student_id' => 'required',
+
+            'duration' => 'required',
+
+            'day' => 'required',
+
+            'time' => 'required',
+
+        ]);
+
+
+        /*
+        get session price
+        */
+
+        $sessionPrice = MentorSessionPrice::where([
+
+            'mentor_id' => $request->mentor_id,
+
+            'duration_minutes' => $request->duration,
+
+        ])->first();
+
+
+        if (!$sessionPrice) {
+
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'Session price not found',
+
+            ]);
+
+        }
+
+
+        /*
+        convert time
+        */
+
+        $startTime = Carbon::createFromFormat('h:i A', $request->time);
+
+        $endTime = (clone $startTime)->addMinutes($request->duration);
+
+
+        /*
+        get session date
+        */
+
+        $sessionDate = Carbon::now()->next(ucfirst($request->day));
+
+
+        /*
+        prevent overlapping booking
+        */
+
+        $alreadyBooked = SessionBooking::where('mentor_id', $request->mentor_id)
+
+            ->where('session_date', $sessionDate->format('Y-m-d'))
+
+            ->where(function ($q) use ($startTime, $endTime) {
+
+                $q->where('start_time', '<', $endTime->format('H:i:s'))
+
+                  ->where('end_time', '>', $startTime->format('H:i:s'));
+
+            })
+
+            ->exists();
+
+
+        if ($alreadyBooked) {
+
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'This time slot is already booked',
+
+            ]);
+
+        }
+
+
+        /*
+        find student from request
+        */
+
+        $student = Student::find($request->student_id);
+
+
+        if (!$student) {
+
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'Student not found',
+
+            ]);
+
+        }
+
+
+        /*
+        calculate price
+        */
+
+        $price = $sessionPrice->discount_price
+
+            ?? $sessionPrice->price
+
+            ?? 0;
+
+
+        /*
+        save booking
+        */
+
+        $booking = SessionBooking::create([
+
+            'mentor_id' => $request->mentor_id,
+
+            'student_id' => $student->id,
+
+            'session_price_id' => $sessionPrice->id,
+
+            'session_date' => $sessionDate->format('Y-m-d'),
+
+            'start_time' => $startTime->format('H:i:s'),
+
+            'end_time' => $endTime->format('H:i:s'),
+
+            'duration_minutes' => $request->duration,
+
+            'price' => $sessionPrice->price,
+
+            'discount_price' => $sessionPrice->discount_price,
+
+            'final_price' => $price,
+
+            'payment_status' => 'pending',
+
+            'meeting_platform' => 'zoom',
+
+            'status' => 'pending',
+
+        ]);
+
+
+        DB::commit();
+
+
+        return response()->json([
+
+            'success' => true,
+
+            'booking_id' => $booking->id,
+
+            'message' => 'Session booked successfully',
+
+        ]);
+
+
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return response()->json([
+
+            'success' => false,
+
+            'error' => $e->getMessage(),
+
+        ]);
+
+    }
+
+}
 }

@@ -71,7 +71,35 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request)
 
 
 
+// POST  http: //localhost/laravel/efosupdated/public/api/apply-franchise
 
+// All Center
+// GET   http: //localhost/laravel/efosupdated/api/find-center
+
+// Center by State
+// GET   http: //localhost/laravel/efosupdated/api/find-center?state=Bihar
+
+// Mentor 
+// GET   http: //localhost/laravel/efosupdated/api/mentorship
+
+// Mentor  Details
+// GET   http: //localhost/laravel/efosupdated/api/mentorship-details/mentor-efos
+
+
+// Opportunity Highlights
+// GET  http: //localhost/laravel/efosupdated/api/opportunity-highlights
+
+// Opportunity Highlights
+// GET  http: //localhost/laravel/efosupdated/api/opportunity-highlights
+
+//Opportunity Highlights (Jobs by category slug
+// GET   http: //localhost/laravel/efosupdated/api/opportunity-highlights/career-carnival
+
+// Pages
+// GET  http: //localhost/laravel/efosupdated/api/page/efos-founders
+
+// Book Session
+// GET  http: //localhost/laravel/efosupdated/api/book-session
 
 
 /* =====================
@@ -80,28 +108,53 @@ POST ROUTES
 
 Route::post('/student-register', [StudentController::class,'store']);
 Route::post('/apply-job', [HomeApiController::class, 'applyJob']);
+Route::post('/apply-franchise', [HomeApiController::class, 'applyFranchise']);
 
+Route::post('/book-session', [HomeApiController::class, 'bookSession']);
 
 
 /* =====================
 GET ROUTES
 ===================== */
 
-Route::get('/blogs', [HomeApiController::class, 'blogs']);
-Route::get('/blog-details/{slug}', [HomeApiController::class,'blogDetails']);
-Route::get('/courses', [HomeApiController::class, 'courses']);
+
+Route::get('/blogs', [HomeApiController::class,'blogs']);
+Route::get('/blog-details/{slug}',[HomeApiController::class,'blogDetails']);
+Route::get('/courses', [HomeApiController::class,'courses']);
 Route::get('/course-details/{slug}', [HomeApiController::class,'coursesDetails']);
 Route::get('/lesson-details/{slug}', [HomeApiController::class,'lessonDetails']);
-Route::get('/quiz/{id}', [HomeApiController::class, 'quizDetails']);
-Route::get('/bundles', [HomeApiController::class, 'bundles']);
-Route::get('/jobs', [HomeApiController::class, 'jobs']);
+Route::get('/quiz/{id}',[HomeApiController::class,'quizDetails']);
+Route::get('/bundles',[HomeApiController::class, 'bundles']);
+Route::get('/jobs',[HomeApiController::class, 'jobs']);
 Route::get('/similar-jobs/{slug}', [HomeApiController::class, 'similarJobs']);
 Route::get('/job-categories', [HomeApiController::class, 'jobCategories']);
 Route::get('/job-subcategories/{categoryId}', [HomeApiController::class, 'jobSubCategories']);
 Route::get('/job-details/{slug}', [HomeApiController::class, 'jobDetails']);
-Route::get('/jobs-filter', [HomeApiController::class, 'jobsFilter']);
-Route::get('/news-events', [HomeApiController::class, 'newsEvents']);
-Route::get('/youtube-videos', [HomeApiController::class, 'youtubeVideos']);
+Route::get('/jobs-filter',[HomeApiController::class,'jobsFilter']);
+Route::get('/news-events',[HomeApiController::class,'newsEvents']);
+Route::get('/youtube-videos',[HomeApiController::class,'youtubeVideos']);
+Route::get('/find-center',[HomeApiController::class,'findCenter']);
+Route::get('/opportunity-highlights/{slug?}', [HomeApiController::class, 'opportunityHighlights']);
+Route::get('/find-center',[HomeApiController::class,'findCenter']);
+Route::get('/mentorship', [HomeApiController::class, 'mentorship']);
+Route::get('/mentorship-details/{slug}', [HomeApiController::class, 'mentorshipDetails']);
+Route::get('/page/{slug}', [HomeApiController::class, 'pageDetails']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
