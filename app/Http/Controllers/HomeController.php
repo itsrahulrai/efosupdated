@@ -71,42 +71,6 @@ class HomeController extends Controller
         return view('frontend.bundle-courses', compact('bundles'));
     }
 
-    // old working code
-    // public function coursesDetails($slug)
-    // {
-    //     $course = LearningCourse::with([
-    //         'subject',
-    //         'chapters' => function ($q)
-    //         {
-    //             $q->active()->orderBy('sort_order');
-    //         },
-    //         'chapters.lessons' => function ($q)
-    //         {
-    //             $q->where('status', 1)->orderBy('sort_order');
-    //         },
-    //     ])
-    //         ->where('slug', $slug)
-    //         ->where('status', 1)
-    //         ->firstOrFail();
-
-    //     // Check if student already purchased/enrolled
-    //     $alreadyPurchased = false;
-
-    //     if (Auth::check() && Auth::user()->role === 'student')
-    //     {
-    //         $alreadyPurchased = CourseBuy::where('user_id', Auth::id())
-    //             ->where('learning_course_id', $course->id)
-    //             ->where('payment_status', 'success')
-    //             ->exists();
-
-    //     }
-
-    //     return view(
-    //         'frontend.skill-courses-details',
-    //         compact('course', 'alreadyPurchased')
-    //     );
-    // }
-
     // new code with bundle
 
     public function coursesDetails($slug)
@@ -301,47 +265,6 @@ class HomeController extends Controller
         return view('frontend.course-details', compact('course', 'seo'));
     }
 
-    // public function opportunityHighlights(Request $request, Category $category = null)
-    // {
-    //     $categories    = Category::where('status', 1)->get();
-    //     $subCategories = SubCategory::where('status', 1)->get();
-
-    //     $jobs = Job::where('status', 1)
-
-    //         ->when(
-    //             $category,
-    //             fn($q) => $q->where('category_id', $category->id)
-    //         )
-
-    //         ->when(
-    //             $request->sub_category_id,
-    //             fn($q) => $q->where('sub_category_id', $request->sub_category_id)
-    //         )
-
-    //         ->when($request->date_posted, function ($q) use ($request) {
-    //             match ($request->date_posted) {
-    //                 '24h' => $q->where('created_at', '>=', now()->subDay()),
-    //                 '3d'  => $q->where('created_at', '>=', now()->subDays(3)),
-    //                 '7d'  => $q->where('created_at', '>=', now()->subDays(7)),
-    //                 default => null
-    //             };
-    //         })
-
-    //         ->latest()
-    //         ->paginate(10);
-
-    //     if ($request->ajax()) {
-    //         return view('frontend.partials.jobs-list', compact('jobs'))->render();
-    //     }
-
-    //     return view('frontend.opportunity-highlights', compact(
-    //         'jobs',
-    //         'categories',
-    //         'subCategories',
-    //         'category'
-    //     ));
-    // }
-
     public function opportunityHighlights(Request $request, JobCategory $category = null)
     {
 
@@ -444,19 +367,7 @@ class HomeController extends Controller
             compact('job', 'similarJobs', 'alreadyApplied')
         );
     }
-
-    // public function careerUpdates()
-    // {
-    //     $blogs = Blog::latest()->paginate(21);
-    //     $seo   = [
-    //         'title'       => 'Career Guidance Services | EFOS Edumarketers Pvt Ltd',
-    //         'description' => 'EFOS Edumarketers Pvt Ltd offers expert career guidance, counselling, and skill development support to help students choose the right career path for a successful future.',
-    //         'keywords'    => 'career guidance, EFOS Edumarketers, career counselling, student counselling, skill development, education services, career planning, career support',
-    //         'robots'      => 'index, follow',
-    //         'canonical'   => url()->current(),
-    //     ];
-    //     return view('frontend.career-updates', compact('blogs', 'seo'));
-    // }
+   
 
     public function newsEvents()
         {
