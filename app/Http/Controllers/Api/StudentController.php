@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
 use App\Models\CourseBuy;
+use App\Models\Document;
 use App\Models\LearningCourse;
 use App\Models\QuizResult;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Models\Document;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -347,47 +347,86 @@ class StudentController extends Controller
         $user = $request->user();
         $student = $user->student;
 
-        if(!$student)
+        if (!$student)
         {
             return response()->json([
-                'status'=>false,
-                'message'=>'Student profile not found'
-            ],404);
+                'status' => false,
+                'message' => 'Student profile not found',
+            ], 404);
         }
 
         $uploadPath = public_path('uploads/documents');
 
-        if(!file_exists($uploadPath))
+        if (!file_exists($uploadPath))
         {
-            mkdir($uploadPath,0777,true);
+            mkdir($uploadPath, 0777, true);
         }
         $uploadedDocs = [];
-        foreach($request->documents as $doc)
+        foreach ($request->documents as $doc)
         {
             $file = $doc['file'];
             $extension = $file->extension();
-            $sizeKB = round($file->getSize()/1024);
-            $fileName = 'doc_'.time().'_'.uniqid().'.'.$extension;
-            $file->move($uploadPath,$fileName);
+            $sizeKB = round($file->getSize() / 1024);
+            $fileName = 'doc_' . time() . '_' . uniqid() . '.' . $extension;
+            $file->move($uploadPath, $fileName);
 
             $document = Document::create([
-                'user_id'=>$user->id,
-                'student_id'=>$student->id,
-                'title'=>$doc['title'],
-                'file_path'=>'uploads/documents/'.$fileName,
-                'file_type'=>$extension,
-                'file_size'=>$sizeKB,
-                'is_verified'=>0
+                'user_id' => $user->id,
+                'student_id' => $student->id,
+                'title' => $doc['title'],
+                'file_path' => 'uploads/documents/' . $fileName,
+                'file_type' => $extension,
+                'file_size' => $sizeKB,
+                'is_verified' => 0,
             ]);
             $uploadedDocs[] = $document;
         }
         return response()->json([
-            'status'=>true,
-            'message'=>'Documents uploaded successfully',
-            'data'=>$uploadedDocs
+            'status' => true,
+            'message' => 'Documents uploaded successfully',
+            'data' => $uploadedDocs,
 
         ]);
 
     }
 
+    public function quizResults(Request $request)
+    {
+        $results = QuizResult::
+            with('quiz')
+            ->where('user_id', $request->user()->id)
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $results,
+        ]);
+
+    }
+
+    public function quizResultDetails($id, Request $request)
+    {
+        $result = QuizResult::
+            with([
+            'quiz.course',
+            'quizAnswers.question.correctOption',
+            'quizAnswers.selectedOption',
+        ])->where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if (!$result)
+        {
+            return response()->json([
+                'status' => false,
+                'message' => 'Result not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $result,
+        ]);
+    }
 }

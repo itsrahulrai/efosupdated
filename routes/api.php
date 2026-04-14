@@ -178,11 +178,12 @@ Route::middleware(['auth:sanctum'])->prefix('student')->group(function ()
     Route::post('/bundle-payment-initiate/{bundle_id}', [CourseBuyApiController::class, 'initiateBundlePayment']);
 
 
-    Route::post('/lesson-complete/{lesson_id}', [StudentController::class, 'markComplete']);
-
-    Route::get('/quiz/{quiz_id}', [StudentController::class, 'show']);
+    
 
     Route::get('/quiz-results', [StudentController::class, 'quizResults']);
+    Route::get('/quiz-result/{id}', [StudentController::class, 'quizResultDetails']);
+
+
 
     Route::get('/certificate/{id}', [StudentController::class, 'certificateDetails']);
 
@@ -216,13 +217,14 @@ Route::middleware(['auth:sanctum'])->prefix('student')->group(function ()
 //Payment Initiate Course Bundle
 // POST  http: //localhost/laravel/efosupdated/api/student/bundle-payment-initiate/1
 
+// Get Quiz Results
+// GET  http://localhost/laravel/efosupdated/api/student/quiz-results
+
+// Get Quiz Results Details
+//GET  http://localhost/laravel/efosupdated/api/student/quiz-result/24
 
 
 
-// POST /api/student/lesson-complete/{lesson_id}
-
-// GET  /api/student/quiz/{quiz_id}
-// GET  /api/student/quiz-results
 
 // GET  /api/student/certificate/{id}
 
