@@ -26,3 +26,4 @@ class Certificate extends Model
     }
 
 }
+

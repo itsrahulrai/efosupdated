@@ -478,7 +478,6 @@
 
 
 
-
     Route::get('{slug}', [PageController::class, 'show'])
         ->name('pages.show');
 
