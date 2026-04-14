@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\CourseBuyApiController;
 use App\Http\Controllers\Api\HomeApiController;
 use App\Http\Controllers\Api\StudentController;
-use App\Http\Controllers\Api\CourseBuyApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -172,12 +172,11 @@ Route::middleware(['auth:sanctum'])->prefix('student')->group(function ()
     Route::post('/documents-upload', [StudentController::class, 'uploadDocuments']);
 
     Route::post('/course-enroll-free/{course_id}', [CourseBuyApiController::class, 'enrollFree']);
-    Route::post('/bundle-enroll-free/{bundle_id}', [CourseBuyApiController::class, 'enrollBundleFree']);
+    Route::post('/bundle-enroll-free/{bundle}', [CourseBuyApiController::class, 'enrollBundleFree']);
 
+    Route::post('/payment-initiate/{course_id}', [CourseBuyApiController::class, 'initiatePayment']);
+    Route::post('/bundle-payment-initiate/{bundle_id}', [CourseBuyApiController::class, 'initiateBundlePayment']);
 
-    Route::post('/payment-initiate/{course_id}', [StudentController::class, 'initiatePayment']);
-
-    Route::post('/bundle-payment-initiate/{bundle_id}', [StudentController::class, 'initiateBundlePayment']);
 
     Route::post('/lesson-complete/{lesson_id}', [StudentController::class, 'markComplete']);
 
@@ -199,28 +198,26 @@ Route::middleware(['auth:sanctum'])->prefix('student')->group(function ()
 
 // Body (form-data)
 
-// KEY              	       TYPE	                    VALUE
-// documents[0][title]	       text	                    Aadhaar Card
-// documents[0][file]	       file	                    aadhaar.pdf
-// documents[1][title]	       text	                    Photo
-// documents[1][file]	       file	                    photo.jpg
+// KEY                         TYPE                        VALUE
+// documents[0][title]           text                        Aadhaar Card
+// documents[0][file]           file                        aadhaar.pdf
+// documents[1][title]           text                        Photo
+// documents[1][file]           file                        photo.jpg
+
+// Buy Free Course
+// POST http://localhost/laravel/efosupdated/api/student/course-enroll-free/3
+
+// Buy Free Bundle Course
+// POST http: //localhost/laravel/efosupdated/api/student/bundle-enroll-free/2
+
+//Payment Initiate Course
+//POST http://localhost/laravel/efosupdated/api/student/payment-initiate/5
+
+//Payment Initiate Course Bundle
+// POST  http: //localhost/laravel/efosupdated/api/student/bundle-payment-initiate/1
 
 
 
-// POST http: //localhost/laravel/efosupdated/api/student/course-enroll-free/3
-
-
-
-
-
-
-
-
-// POST /api/student/course-enroll-free/{course_id}
-// POST /api/student/bundle-enroll-free/{bundle_id}
-
-// POST /api/student/payment-initiate/{course_id}
-// POST /api/student/bundle-payment-initiate/{bundle_id}
 
 // POST /api/student/lesson-complete/{lesson_id}
 
@@ -230,7 +227,6 @@ Route::middleware(['auth:sanctum'])->prefix('student')->group(function ()
 // GET  /api/student/certificate/{id}
 
 // POST /api/student/book-session
-
 
 // After Login Response
 

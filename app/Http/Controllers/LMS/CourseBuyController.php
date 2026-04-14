@@ -666,4 +666,5 @@ class CourseBuyController extends Controller
 
         return view('frontend.bundle-thank-you', compact('courseBuy'));
     }
+    
     }
